@@ -9,28 +9,23 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const botoesVoltar = document.querySelectorAll("[id^='btn-voltar']");
-  
-  // Função para trocar telas
+
   function mostrarTela(id) {
-    telas.forEach(tela => tela.classList.remove("active"));
+    telas.forEach((tela) => tela.classList.remove("active"));
     document.getElementById(id).classList.add("active");
     window.scrollTo(0, 0);
   }
 
-  // Eventos principais
   botoes.cadastro.addEventListener("click", () => mostrarTela("tela-cadastro"));
   botoes.entrada.addEventListener("click", () => mostrarTela("tela-entrada"));
   botoes.saida.addEventListener("click", () => mostrarTela("tela-saida"));
   botoes.saldo.addEventListener("click", () => mostrarTela("tela-saldo"));
-
-  // Botões de voltar
-  botoesVoltar.forEach(btn => {
-    btn.addEventListener("click", () => mostrarTela("tela-principal"));
-  });
+  botoesVoltar.forEach((btn) =>
+    btn.addEventListener("click", () => mostrarTela("tela-principal"))
+  );
 });
 
-
-// ======== CADASTRO DE PRODUTO ======== //
+// ======== ENVIO DO CADASTRO VIA MICROSOFT FORMS ======== //
 document.addEventListener("DOMContentLoaded", () => {
   const formCadastro = document.getElementById("form-cadastro");
 
@@ -48,35 +43,22 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Corpo que será enviado para o Power Automate ou API
-    const dadosProduto = {
-      CodigoFabrica: codigoFabrica,
-      CodigoFornecedor: codigoFornecedor,
-      DescricaoProduto: descricaoProduto,
-      NomeFornecedor: nomeFornecedor,
-      UnidadeMedida: unidadeMedida
-    };
+    // Seu Forms URL
+    const formsUrl = "https://forms.office.com/r/cYKFvRQbRV";
 
-    try {
-      const resposta = await fetch("https://prod-00.brazilsouth.logic.azure.com:443/workflows/SEU_FLUXO_AQUI/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=SUA_ASSINATURA_AQUI", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dadosProduto)
-      });
+    // Abre o Microsoft Forms em uma nova aba com os dados preenchidos (simulação de integração)
+    const queryString = new URLSearchParams({
+      "Código de Fábrica": codigoFabrica,
+      "Código do Fornecedor": codigoFornecedor,
+      "Descrição do Produto": descricaoProduto,
+      "Nome do Fornecedor": nomeFornecedor,
+      "Unidade de Medida": unidadeMedida,
+    }).toString();
 
-      if (resposta.ok) {
-        alert("✅ Produto cadastrado com sucesso!");
-        formCadastro.reset();
-      } else {
-        const erro = await resposta.text();
-        alert(`❌ Falha ao enviar o produto: ${erro}`);
-      }
+    // O Forms não aceita pré-preenchimento de forma nativa, então apenas abre para envio manual
+    alert("✅ Dados preparados. Envie pelo Forms que o Power Automate cuidará do SharePoint.");
+    window.open(formsUrl, "_blank");
 
-    } catch (erro) {
-      alert("❌ Falha ao conectar com o servidor. Verifique a internet ou o fluxo.");
-      console.error("Erro no envio:", erro);
-    }
+    formCadastro.reset();
   });
 });
