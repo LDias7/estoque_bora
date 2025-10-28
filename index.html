@@ -88,12 +88,10 @@ body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;
 </div>
 
 <script>
-// URLs dos Forms oficiais (mantendo seu fluxo Power Automate)
 const FORM_CADASTRO = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUODg1NjJLTEYzOFRaVjlGMFEwWDJVSEVWWi4u";
 const FORM_SAIDA = "https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUMEg4TTdMVVJaUktJTlpPR1NCQjBITllISS4u";
 
-// Troca de telas
 document.addEventListener("DOMContentLoaded", () => {
   const telas = document.querySelectorAll(".screen");
   const mostrarTela = id => {
@@ -101,21 +99,43 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(id).classList.add("active");
     window.scrollTo(0,0);
   };
-  
   document.getElementById("btn-cadastro").onclick = () => mostrarTela("tela-cadastro");
   document.getElementById("btn-entrada").onclick = () => mostrarTela("tela-entrada");
   document.getElementById("btn-saida").onclick = () => mostrarTela("tela-saida");
   document.getElementById("btn-saldo").onclick = () => mostrarTela("tela-saldo");
-
   document.getElementById("btn-voltar-cadastro").onclick = () => mostrarTela("tela-principal");
   document.getElementById("btn-voltar-entrada").onclick = () => mostrarTela("tela-principal");
   document.getElementById("btn-voltar-saida").onclick = () => mostrarTela("tela-principal");
   document.getElementById("btn-voltar-saldo").onclick = () => mostrarTela("tela-principal");
 
-  // Botões que abrem os Forms em nova aba (sem bloqueio)
   document.getElementById("abrirCadastro").onclick = () => window.open(FORM_CADASTRO, "_blank");
   document.getElementById("abrirEntrada").onclick = () => window.open(FORM_ENTRADA, "_blank");
   document.getElementById("abrirSaida").onclick = () => window.open(FORM_SAIDA, "_blank");
+
+  const inputBusca = document.getElementById("campo-busca");
+  const resultado = document.getElementById("resultado-saldo");
+
+  inputBusca.addEventListener("keypress", async (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const codigo = inputBusca.value.trim();
+      if (!codigo) return alert("Digite um código ou descrição.");
+      resultado.innerHTML = "<p>🔄 Consultando saldo...</p>";
+      try {
+        const res = await fetch(`/api/saldoSharePoint?codigo=${codigo}`);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        resultado.innerHTML = `
+          <p><strong>Produto:</strong> ${data.codigo}</p>
+          <p><strong>Entradas:</strong> ${data.entradas}</p>
+          <p><strong>Saídas:</strong> ${data.saidas}</p>
+          <p><strong>Saldo Atual:</strong> <span class="large-text">${data.saldo}</span></p>
+        `;
+      } catch (err) {
+        resultado.innerHTML = `<p style="color:red;">❌ Erro ao consultar: ${err.message}</p>`;
+      }
+    }
+  });
 });
 </script>
 </body>
