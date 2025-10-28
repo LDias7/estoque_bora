@@ -22,18 +22,46 @@ body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;
 .button-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .main-button{background:var(--cor-primaria);color:var(--cor-secundaria);border:none;padding:25px 15px;font-size:1.2em;font-weight:bold;border-radius:6px;cursor:pointer;transition:.3s;}
 .main-button:hover{background:#003366;}
-.form-actions{margin-top:25px;display:flex;justify-content:center;gap:15px;position:sticky;bottom:15px;background:#fff;padding-top:15px;}
-.action-button{flex:1;padding:12px;font-weight:bold;border:none;border-radius:5px;cursor:pointer;transition:.3s;}
-.action-button.primary{background:var(--cor-primaria);color:white;}
-.action-button.primary:hover{background:#003366;}
-.action-button.secondary{background:#ccc;}
-.action-button.secondary:hover{background:#aaa;}
 .data-display{background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:4px;margin-bottom:20px;border-left:5px solid var(--cor-primaria);}
 .large-text{font-size:1.6em;font-weight:bold;}
-iframe{border:none;width:100%;height:850px;border-radius:8px;}
-.forms-wrap{position:relative;overflow:hidden;border:2px solid #002855;border-radius:8px;}
-.forms-wrap .mask-bottom{position:absolute;left:0;right:0;bottom:0;height:80px;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,#fff 60%);}
+iframe{
+  border:none;
+  width:100%;
+  height:800px;
+  border-radius:8px;
+  overflow:hidden;
+}
+.forms-wrap{
+  position:relative;
+  overflow:hidden;
+  border:2px solid #002855;
+  border-radius:8px;
+}
+.forms-wrap .mask-bottom{
+  display:none;
+}
+
+/* 🔹 Botão flutuante fixo no canto inferior direito */
+.btn-flutuante{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  background:var(--cor-primaria);
+  color:white;
+  border:none;
+  padding:15px 25px;
+  border-radius:50px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,0.25);
+  transition:0.3s;
+  z-index:999;
+}
+.btn-flutuante:hover{
+  background:#003366;
+}
 </style>
+
 
 </head>
 
@@ -160,4 +188,5 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
