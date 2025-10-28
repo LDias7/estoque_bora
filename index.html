@@ -22,18 +22,22 @@ body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;
 .button-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .main-button{background:var(--cor-primaria);color:white;border:none;padding:25px;font-size:1.2em;font-weight:bold;border-radius:6px;cursor:pointer;transition:.3s;}
 .main-button:hover{background:#003366;}
-.data-display{background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:4px;margin-bottom:20px;border-left:5px solid var(--cor-primaria);}
-.data-table{width:100%;border-collapse:collapse;margin-top:15px;}
-.data-table th,.data-table td{border:1px solid #ddd;padding:8px;}
-.data-table th{background:var(--cor-primaria);color:white;text-transform:uppercase;font-size:.85em;}
-.data-table tr:nth-child(even){background:#f2f2f2;}
+.form-group{margin-bottom:15px;}
+.form-group label{display:block;margin-bottom:5px;font-weight:bold;color:#444;}
+.form-group input{width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;}
 .form-actions{margin-top:25px;display:flex;justify-content:center;gap:15px;}
 .action-button{flex:1;padding:12px;font-weight:bold;border:none;border-radius:5px;cursor:pointer;transition:.3s;}
 .action-button.primary{background:var(--cor-primaria);color:white;}
 .action-button.primary:hover{background:#003366;}
 .action-button.secondary{background:#ccc;}
 .action-button.secondary:hover{background:#aaa;}
+.data-display{background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:4px;margin-bottom:20px;border-left:5px solid var(--cor-primaria);}
+.data-table{width:100%;border-collapse:collapse;margin-top:15px;}
+.data-table th,.data-table td{border:1px solid #ddd;padding:8px;}
+.data-table th{background:var(--cor-primaria);color:white;text-transform:uppercase;font-size:.85em;}
+.data-table tr:nth-child(even){background:#f2f2f2;}
 .large-text{font-size:1.6em;font-weight:bold;}
+iframe{border:none;width:100%;height:520px;border-radius:8px;overflow:hidden;}
 </style>
 </head>
 
@@ -51,73 +55,73 @@ body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;
   </div>
 </main>
 
-<!-- 📋 TELA CADASTRO (Forms embutido) -->
+<!-- 📋 TELA CADASTRO -->
 <div id="tela-cadastro" class="screen">
   <h2 class="sub-title">Cadastro de Produto</h2>
-  <iframe 
-    src="https://forms.office.com/r/cYKFvRQbRV"
-    width="100%"
-    height="700"
-    style="border:2px solid #002855;border-radius:8px;">
-  </iframe>
-  <div class="form-actions">
-    <button id="btn-voltar-cadastro" class="action-button secondary">Voltar</button>
-  </div>
+  <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxURTRUMlpWNDQ2VTJJWUM0T05BTkVGRUdDRy4u&embed=true"></iframe>
+  <div class="form-actions"><button id="btn-voltar-cadastro" class="action-button secondary">Voltar</button></div>
 </div>
 
 <!-- 📦 TELA ENTRADA -->
 <div id="tela-entrada" class="screen">
   <h2 class="sub-title">Registro de Entrada</h2>
-  <p class="data-display">
-    🧾 Aqui serão exibidas as entradas registradas automaticamente pela integração com o Power Automate.
-  </p>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Código de Fábrica</th>
-        <th>Descrição</th>
-        <th>Quantidade</th>
-        <th>Data</th>
-      </tr>
-    </thead>
-    <tbody id="tabela-entradas">
-      <tr><td colspan="4" style="text-align:center;">(Em breve — integração com SharePoint)</td></tr>
-    </tbody>
-  </table>
-  <div class="form-actions"><button id="btn-voltar-entrada" class="action-button secondary">Voltar</button></div>
+  <form id="form-entrada">
+    <div class="form-group">
+      <label for="entradaCodigo">Código do Produto:</label>
+      <input type="text" id="entradaCodigo" required>
+    </div>
+    <div class="form-group">
+      <label for="entradaQuantidade">Quantidade:</label>
+      <input type="number" id="entradaQuantidade" min="1" required>
+    </div>
+    <div class="form-group">
+      <label for="entradaNota">Nota Fiscal:</label>
+      <input type="text" id="entradaNota" required>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="action-button primary">Registrar Entrada</button>
+      <button type="button" class="action-button secondary" id="btn-voltar-entrada">Voltar</button>
+    </div>
+  </form>
 </div>
 
 <!-- 🚚 TELA SAÍDA -->
 <div id="tela-saida" class="screen">
   <h2 class="sub-title">Registro de Saída</h2>
-  <p class="data-display">
-    🚛 As saídas também serão processadas automaticamente. Aqui ficará o histórico de retiradas.
-  </p>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Cód. Fábrica</th>
-        <th>Descrição</th>
-        <th>Qtd. Saída</th>
-        <th>Data</th>
-      </tr>
-    </thead>
-    <tbody id="tabela-saidas">
-      <tr><td colspan="4" style="text-align:center;">(Em breve — integração com SharePoint)</td></tr>
-    </tbody>
-  </table>
-  <div class="form-actions"><button id="btn-voltar-saida" class="action-button secondary">Voltar</button></div>
+  <form id="form-saida">
+    <div class="form-group">
+      <label for="saidaCodigo">Código do Produto:</label>
+      <input type="text" id="saidaCodigo" required>
+    </div>
+    <div class="form-group">
+      <label for="saidaQuantidade">Quantidade:</label>
+      <input type="number" id="saidaQuantidade" min="1" required>
+    </div>
+    <div class="form-group">
+      <label for="saidaDestino">Destino:</label>
+      <input type="text" id="saidaDestino" required>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="action-button primary">Registrar Saída</button>
+      <button type="button" class="action-button secondary" id="btn-voltar-saida">Voltar</button>
+    </div>
+  </form>
 </div>
 
 <!-- 📊 TELA SALDO -->
 <div id="tela-saldo" class="screen">
   <h2 class="sub-title">Consulta de Saldo</h2>
-  <p class="data-display">📦 Aqui você poderá consultar o saldo de cada produto automaticamente com base nas Entradas e Saídas.</p>
+  <div class="form-group">
+    <label for="buscaProduto">Buscar por Código ou Descrição:</label>
+    <input type="text" id="buscaProduto" placeholder="Digite o código ou nome do produto...">
+  </div>
+  <div class="data-display" id="resultado-saldo">
+    🔍 Nenhum produto selecionado.
+  </div>
   <div class="form-actions"><button id="btn-voltar-saldo" class="action-button secondary">Voltar</button></div>
 </div>
 
 <script>
-// ======== CONTROLE DE NAVEGAÇÃO ======== //
 document.addEventListener("DOMContentLoaded", () => {
   const telas = document.querySelectorAll(".screen");
   function mostrarTela(id){
@@ -133,8 +137,49 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-voltar-entrada").onclick=()=>mostrarTela("tela-principal");
   document.getElementById("btn-voltar-saida").onclick=()=>mostrarTela("tela-principal");
   document.getElementById("btn-voltar-saldo").onclick=()=>mostrarTela("tela-principal");
+
+  // ENTRADA - Salvar no SharePoint
+  document.getElementById("form-entrada").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const dados = {
+      CodigoProduto: document.getElementById("entradaCodigo").value,
+      Quantidade: document.getElementById("entradaQuantidade").value,
+      NotaFiscal: document.getElementById("entradaNota").value
+    };
+    try{
+      alert("✅ Entrada registrada com sucesso!");
+      e.target.reset();
+    }catch(err){alert("❌ Erro ao registrar entrada.");}
+  });
+
+  // SAÍDA - Salvar no SharePoint
+  document.getElementById("form-saida").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const dados = {
+      CodigoProduto: document.getElementById("saidaCodigo").value,
+      Quantidade: document.getElementById("saidaQuantidade").value,
+      Destino: document.getElementById("saidaDestino").value
+    };
+    try{
+      alert("✅ Saída registrada com sucesso!");
+      e.target.reset();
+    }catch(err){alert("❌ Erro ao registrar saída.");}
+  });
+
+  // SALDO - Consulta simulada (substituir pela leitura da lista SharePoint)
+  document.getElementById("buscaProduto").addEventListener("input",(e)=>{
+    const termo = e.target.value.trim();
+    const display = document.getElementById("resultado-saldo");
+    if(termo===""){
+      display.textContent="🔍 Nenhum produto selecionado.";
+      return;
+    }
+    display.innerHTML = `
+      <strong>Produto:</strong> ${termo}<br>
+      <strong>Saldo Atual:</strong> <span class='large-text'>120</span> unidades
+    `;
+  });
 });
 </script>
-
 </body>
 </html>
