@@ -1,69 +1,82 @@
-// ============================================================
-//  SISTEMA DE ESTOQUE - INTEGRAÇÃO VIA MICROSOFT FORMS
-// ============================================================
-
-// URL do seu Microsoft Forms (envio automático)
-const FORMS_URL = "https://forms.microsoft.com/r/cYKFvRQbRV";
-
-// ============================================================
-//  FUNÇÃO: ENVIAR PRODUTO PARA O MICROSOFT FORMS
-// ============================================================
-async function enviarProdutoForms(dadosProduto) {
-    try {
-        const response = await fetch("/enviarForms", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dadosProduto)
-        });
-
-        if (!response.ok) throw new Error("Erro ao enviar dados");
-
-        alert("✅ Produto enviado com sucesso! Aguarde alguns segundos e verifique a lista no SharePoint.");
-        document.getElementById("form-cadastro").reset();
-        navegarPara("tela-cadastro", "tela-principal");
-    } catch (error) {
-        alert(`❌ Falha ao enviar: ${error.message}`);
-        console.error("Erro ao enviar produto:", error);
-    }
-}
-
-
-// ============================================================
-//  NAVEGAÇÃO ENTRE TELAS
-// ============================================================
-function navegarPara(telaAtualId, proximaTelaId) {
-    document.querySelectorAll('.screen').forEach(tela => tela.classList.remove('active'));
-    const proximaTela = document.getElementById(proximaTelaId);
-    if (proximaTela) proximaTela.classList.add('active');
-}
-
-// ============================================================
-//  EVENTOS PRINCIPAIS
-// ============================================================
+// ======== CONTROLE DE TELAS ======== //
 document.addEventListener("DOMContentLoaded", () => {
+  const telas = document.querySelectorAll(".screen");
+  const botoes = {
+    cadastro: document.getElementById("btn-cadastro"),
+    entrada: document.getElementById("btn-entrada"),
+    saida: document.getElementById("btn-saida"),
+    saldo: document.getElementById("btn-saldo"),
+  };
 
-    // ----- Botões principais -----
-    document.getElementById("btn-cadastro").addEventListener("click", () => navegarPara("tela-principal", "tela-cadastro"));
-    document.getElementById("btn-voltar-cadastro").addEventListener("click", () => navegarPara("tela-cadastro", "tela-principal"));
+  const botoesVoltar = document.querySelectorAll("[id^='btn-voltar']");
+  
+  // Função para trocar telas
+  function mostrarTela(id) {
+    telas.forEach(tela => tela.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    window.scrollTo(0, 0);
+  }
 
-    // ----- Envio do formulário -----
-    document.getElementById("form-cadastro").addEventListener("submit", async (e) => {
-        e.preventDefault();
+  // Eventos principais
+  botoes.cadastro.addEventListener("click", () => mostrarTela("tela-cadastro"));
+  botoes.entrada.addEventListener("click", () => mostrarTela("tela-entrada"));
+  botoes.saida.addEventListener("click", () => mostrarTela("tela-saida"));
+  botoes.saldo.addEventListener("click", () => mostrarTela("tela-saldo"));
 
-        const dadosProduto = {
-            codigoFabrica: document.getElementById("codigoFabrica").value.trim(),
-            codigoFornecedor: document.getElementById("codigoFornecedor").value.trim(),
-            descricaoProduto: document.getElementById("descricaoProduto").value.trim(),
-            nomeFornecedor: document.getElementById("nomeFornecedor").value.trim(),
-            unidadeMedida: document.getElementById("unidadeMedida").value.trim()
-        };
-
-        if (!dadosProduto.codigoFabrica || !dadosProduto.codigoFornecedor || !dadosProduto.descricaoProduto || !dadosProduto.nomeFornecedor || !dadosProduto.unidadeMedida) {
-            alert("⚠️ Preencha todos os campos antes de salvar!");
-            return;
-        }
-
-        await enviarProdutoForms(dadosProduto);
-    });
+  // Botões de voltar
+  botoesVoltar.forEach(btn => {
+    btn.addEventListener("click", () => mostrarTela("tela-principal"));
+  });
 });
 
+
+// ======== CADASTRO DE PRODUTO ======== //
+document.addEventListener("DOMContentLoaded", () => {
+  const formCadastro = document.getElementById("form-cadastro");
+
+  formCadastro.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const codigoFabrica = document.getElementById("codigoFabrica").value.trim();
+    const codigoFornecedor = document.getElementById("codigoFornecedor").value.trim();
+    const descricaoProduto = document.getElementById("descricaoProduto").value.trim();
+    const nomeFornecedor = document.getElementById("nomeFornecedor").value.trim();
+    const unidadeMedida = document.getElementById("unidadeMedida").value.trim();
+
+    if (!codigoFabrica || !codigoFornecedor || !descricaoProduto || !nomeFornecedor || !unidadeMedida) {
+      alert("⚠️ Preencha todos os campos antes de salvar!");
+      return;
+    }
+
+    // Corpo que será enviado para o Power Automate ou API
+    const dadosProduto = {
+      CodigoFabrica: codigoFabrica,
+      CodigoFornecedor: codigoFornecedor,
+      DescricaoProduto: descricaoProduto,
+      NomeFornecedor: nomeFornecedor,
+      UnidadeMedida: unidadeMedida
+    };
+
+    try {
+      const resposta = await fetch("https://prod-00.brazilsouth.logic.azure.com:443/workflows/SEU_FLUXO_AQUI/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=SUA_ASSINATURA_AQUI", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dadosProduto)
+      });
+
+      if (resposta.ok) {
+        alert("✅ Produto cadastrado com sucesso!");
+        formCadastro.reset();
+      } else {
+        const erro = await resposta.text();
+        alert(`❌ Falha ao enviar o produto: ${erro}`);
+      }
+
+    } catch (erro) {
+      alert("❌ Falha ao conectar com o servidor. Verifique a internet ou o fluxo.");
+      console.error("Erro no envio:", erro);
+    }
+  });
+});
