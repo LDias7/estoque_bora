@@ -1,4 +1,13 @@
 {
+  "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "api/enviarForms.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -9,21 +18,4 @@
         },
         {
           "key": "X-Frame-Options",
-          "value": "ALLOW-FROM https://*.sharepoint.com"
-        }
-      ]
-    }
-  ]
-}
-{
-  "version": 2,
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "api/enviarForms.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
-}
-
+          "value": "ALLOW-FROM
