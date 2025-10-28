@@ -22,10 +22,9 @@ body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;
 .button-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .main-button{background:var(--cor-primaria);color:var(--cor-secundaria);border:none;padding:25px 15px;font-size:1.2em;font-weight:bold;border-radius:6px;cursor:pointer;transition:.3s;}
 .main-button:hover{background:#003366;}
-iframe{border:none;width:100%;height:800px;border-radius:8px;overflow:hidden;}
-.forms-wrap{border:2px solid #002855;border-radius:8px;overflow:hidden;}
-.btn-flutuante{position:fixed;bottom:30px;right:30px;background:var(--cor-primaria);color:white;border:none;padding:15px 25px;border-radius:50px;font-weight:bold;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.25);transition:0.3s;z-index:999;}
-.btn-flutuante:hover{background:#003366;}
+.data-display{background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:4px;margin-bottom:20px;border-left:5px solid var(--cor-primaria);}
+.btn-voltar{display:block;margin:20px auto 0 auto;padding:12px 25px;font-size:1em;font-weight:bold;border:none;border-radius:6px;background:#ccc;color:#000;cursor:pointer;transition:.3s;}
+.btn-voltar:hover{background:#aaa;}
 .saldo-input{width:100%;padding:15px;border:2px solid var(--cor-primaria);border-radius:8px;font-size:1.1em;margin-bottom:20px;transition:.3s;}
 .saldo-input:focus{outline:none;box-shadow:0 0 5px var(--cor-primaria);}
 .resultado-saldo{background:#f8f9fa;border-left:5px solid var(--cor-primaria);padding:20px;border-radius:8px;}
@@ -49,28 +48,31 @@ iframe{border:none;width:100%;height:800px;border-radius:8px;overflow:hidden;}
 <!-- CADASTRO -->
 <div id="tela-cadastro" class="screen">
   <h2 class="sub-title">Cadastro de Produto</h2>
-  <div class="forms-wrap">
-    <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxURTRUMlpWNDQ2VTJJWUM0T05BTkVGRUdDRy4u&embed=true" allowfullscreen></iframe>
+  <div class="data-display">
+    <p>📝 Clique no botão abaixo para abrir o formulário de cadastro do Microsoft Forms.</p>
   </div>
-  <button id="btn-voltar-cadastro" class="btn-flutuante">← Voltar</button>
+  <button id="abrirCadastro" class="main-button" style="width:100%;">Abrir Formulário de Cadastro</button>
+  <button class="btn-voltar" id="btn-voltar-cadastro">Voltar</button>
 </div>
 
 <!-- ENTRADA -->
 <div id="tela-entrada" class="screen">
   <h2 class="sub-title">Registro de Entrada</h2>
-  <div class="forms-wrap">
-    <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUODg1NjJLTEYzOFRaVjlGMFEwWDJVSEVWWi4u&embed=true" allowfullscreen></iframe>
+  <div class="data-display">
+    <p>📦 Clique no botão abaixo para registrar uma nova entrada de produto.</p>
   </div>
-  <button id="btn-voltar-entrada" class="btn-flutuante">← Voltar</button>
+  <button id="abrirEntrada" class="main-button" style="width:100%;">Abrir Formulário de Entrada</button>
+  <button class="btn-voltar" id="btn-voltar-entrada">Voltar</button>
 </div>
 
 <!-- SAÍDA -->
 <div id="tela-saida" class="screen">
   <h2 class="sub-title">Registro de Saída</h2>
-  <div class="forms-wrap">
-    <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUMEg4TTdMVVJaUktJTlpPR1NCQjBITllISS4u&embed=true" allowfullscreen></iframe>
+  <div class="data-display">
+    <p>🚚 Clique no botão abaixo para registrar uma nova saída de produto.</p>
   </div>
-  <button id="btn-voltar-saida" class="btn-flutuante">← Voltar</button>
+  <button id="abrirSaida" class="main-button" style="width:100%;">Abrir Formulário de Saída</button>
+  <button class="btn-voltar" id="btn-voltar-saida">Voltar</button>
 </div>
 
 <!-- SALDO -->
@@ -82,11 +84,16 @@ iframe{border:none;width:100%;height:800px;border-radius:8px;overflow:hidden;}
     <p><strong>Código de Fábrica:</strong> —</p>
     <p><strong>Saldo Atual:</strong> —</p>
   </div>
-  <button id="btn-voltar-saldo" class="btn-flutuante">← Voltar</button>
+  <button class="btn-voltar" id="btn-voltar-saldo">Voltar</button>
 </div>
 
 <script>
-// ======== TROCA DE TELAS ======== //
+// URLs dos Forms oficiais (mantendo seu fluxo Power Automate)
+const FORM_CADASTRO = "https://forms.microsoft.com/r/cYKFvRQbRV";
+const FORM_ENTRADA = "https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUODg1NjJLTEYzOFRaVjlGMFEwWDJVSEVWWi4u";
+const FORM_SAIDA = "https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUMEg4TTdMVVJaUktJTlpPR1NCQjBITllISS4u";
+
+// Troca de telas
 document.addEventListener("DOMContentLoaded", () => {
   const telas = document.querySelectorAll(".screen");
   const mostrarTela = id => {
@@ -94,44 +101,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(id).classList.add("active");
     window.scrollTo(0,0);
   };
+  
   document.getElementById("btn-cadastro").onclick = () => mostrarTela("tela-cadastro");
   document.getElementById("btn-entrada").onclick = () => mostrarTela("tela-entrada");
   document.getElementById("btn-saida").onclick = () => mostrarTela("tela-saida");
   document.getElementById("btn-saldo").onclick = () => mostrarTela("tela-saldo");
+
   document.getElementById("btn-voltar-cadastro").onclick = () => mostrarTela("tela-principal");
   document.getElementById("btn-voltar-entrada").onclick = () => mostrarTela("tela-principal");
   document.getElementById("btn-voltar-saida").onclick = () => mostrarTela("tela-principal");
   document.getElementById("btn-voltar-saldo").onclick = () => mostrarTela("tela-principal");
 
-  // ======== CONSULTA DE SALDO (SharePoint) ======== //
-  const campoBusca = document.getElementById("campo-busca");
-  const resultado = document.getElementById("resultado-saldo");
-  campoBusca.addEventListener("input", async () => {
-    const termo = campoBusca.value.trim();
-    if (termo.length < 2) return;
-    try {
-      const produtos = await fetch("/api/sharepoint?lista=Produtos&filtro=" + encodeURIComponent(termo)).then(r=>r.json());
-      const entradas = await fetch("/api/sharepoint?lista=Entrada&filtro=" + encodeURIComponent(termo)).then(r=>r.json());
-      const saidas = await fetch("/api/sharepoint?lista=Saidas&filtro=" + encodeURIComponent(termo)).then(r=>r.json());
-
-      if (!produtos.length) {
-        resultado.innerHTML = "<p>❌ Produto não encontrado.</p>";
-        return;
-      }
-      const produto = produtos[0];
-      const totalEntradas = entradas.reduce((s,e)=>s+Number(e.Quantidade||0),0);
-      const totalSaidas = saidas.reduce((s,e)=>s+Number(e.Quantidade||0),0);
-      const saldo = totalEntradas - totalSaidas;
-
-      resultado.innerHTML = `
-        <p><strong>Produto:</strong> ${produto.DescricaoProduto || "—"}</p>
-        <p><strong>Código de Fábrica:</strong> ${produto.Title || "—"}</p>
-        <p><strong>Saldo Atual:</strong> ${saldo} ${produto.UnidadeMedida || ""}</p>
-      `;
-    } catch(err){
-      resultado.innerHTML = "<p>⚠️ Erro ao buscar saldo.</p>";
-    }
-  });
+  // Botões que abrem os Forms em nova aba (sem bloqueio)
+  document.getElementById("abrirCadastro").onclick = () => window.open(FORM_CADASTRO, "_blank");
+  document.getElementById("abrirEntrada").onclick = () => window.open(FORM_ENTRADA, "_blank");
+  document.getElementById("abrirSaida").onclick = () => window.open(FORM_SAIDA, "_blank");
 });
 </script>
 </body>
