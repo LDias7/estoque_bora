@@ -6,7 +6,6 @@
 <title>Bora Transportes - Controle de Estoque</title>
 
 <style>
-/* === ESTILO INTEGRADO === */
 :root {
   --cor-primaria: #002855;
   --cor-secundaria: #ffffff;
@@ -21,33 +20,27 @@ body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;
 .screen.active{display:block;}
 .sub-title{text-align:center;color:var(--cor-primaria);margin-bottom:25px;}
 .button-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.main-button{background:var(--cor-primaria);color:var(--cor-secundaria);border:none;padding:25px 15px;font-size:1.2em;font-weight:bold;border-radius:6px;cursor:pointer;transition:.3s;}
+.main-button{background:var(--cor-primaria);color:white;border:none;padding:25px;font-size:1.2em;font-weight:bold;border-radius:6px;cursor:pointer;transition:.3s;}
 .main-button:hover{background:#003366;}
-.form-group{margin-bottom:15px;}
-.form-group label{display:block;margin-bottom:5px;font-weight:bold;color:#444;}
-.form-group input{width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;}
-.form-actions{margin-top:25px;display:flex;justify-content:flex-end;gap:15px;}
-.action-button{flex:1;padding:12px;font-weight:bold;border:none;border-radius:5px;cursor:pointer;transition:.3s;}
-.action-button.primary{background:var(--cor-primaria);color:white;}
-.action-button.primary:hover{background:#003366;}
-.action-button.secondary{background:#ccc;}
-.action-button.secondary:hover{background:#aaa;}
-.action-button.tertiary{background:var(--cor-terciaria);color:white;}
 .data-display{background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:4px;margin-bottom:20px;border-left:5px solid var(--cor-primaria);}
 .data-table{width:100%;border-collapse:collapse;margin-top:15px;}
 .data-table th,.data-table td{border:1px solid #ddd;padding:8px;}
 .data-table th{background:var(--cor-primaria);color:white;text-transform:uppercase;font-size:.85em;}
 .data-table tr:nth-child(even){background:#f2f2f2;}
-.estoque-alerta{font-weight:bold;color:var(--cor-primaria);}
-.estoque-alerta.baixo{color:var(--cor-alerta);}
+.form-actions{margin-top:25px;display:flex;justify-content:center;gap:15px;}
+.action-button{flex:1;padding:12px;font-weight:bold;border:none;border-radius:5px;cursor:pointer;transition:.3s;}
+.action-button.primary{background:var(--cor-primaria);color:white;}
+.action-button.primary:hover{background:#003366;}
+.action-button.secondary{background:#ccc;}
+.action-button.secondary:hover{background:#aaa;}
 .large-text{font-size:1.6em;font-weight:bold;}
 </style>
 </head>
 
 <body>
-<header class="main-header"><h1>Sistema de Gestão de Estoque</h1></header>
+<header class="main-header"><h1>Sistema de Gestão de Estoque - Bora Transportes</h1></header>
 
-<!-- TELA PRINCIPAL -->
+<!-- 🏠 TELA PRINCIPAL -->
 <main id="tela-principal" class="screen active">
   <h2 class="sub-title">Selecione uma Opção</h2>
   <div class="button-grid">
@@ -58,72 +51,73 @@ body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;
   </div>
 </main>
 
-<!-- TELA CADASTRO -->
+<!-- 📋 TELA CADASTRO (Forms embutido) -->
 <div id="tela-cadastro" class="screen">
   <h2 class="sub-title">Cadastro de Produto</h2>
-
-  <form id="form-cadastro">
-    <div class="form-group">
-      <label for="codigoFabrica">Código de Fábrica:</label>
-      <input type="text" id="codigoFabrica" required>
-    </div>
-    <div class="form-group">
-      <label for="codigoFornecedor">Código do Fornecedor:</label>
-      <input type="text" id="codigoFornecedor" required>
-    </div>
-    <div class="form-group">
-      <label for="descricaoProduto">Descrição do Produto:</label>
-      <input type="text" id="descricaoProduto" required>
-    </div>
-    <div class="form-group">
-      <label for="nomeFornecedor">Nome do Fornecedor:</label>
-      <input type="text" id="nomeFornecedor" required>
-    </div>
-    <div class="form-group">
-      <label for="unidadeMedida">Unidade de Medida:</label>
-      <input type="text" id="unidadeMedida" required>
-    </div>
-
-    <div class="form-actions">
-      <button type="button" class="action-button primary" id="btn-abrir-forms">Cadastrar</button>
-      <button type="button" class="action-button secondary" id="btn-voltar-cadastro">Voltar</button>
-    </div>
-  </form>
-
-  <!-- Aqui o Forms será exibido embutido -->
-  <div id="iframe-container" style="display:none; margin-top:30px;">
-    <iframe id="iframe-forms" 
-            src="" 
-            width="100%" 
-            height="650px" 
-            style="border:2px solid #002855; border-radius:8px;"></iframe>
+  <iframe 
+    src="https://forms.office.com/r/cYKFvRQbRV"
+    width="100%"
+    height="700"
+    style="border:2px solid #002855;border-radius:8px;">
+  </iframe>
+  <div class="form-actions">
+    <button id="btn-voltar-cadastro" class="action-button secondary">Voltar</button>
   </div>
 </div>
 
-
-<!-- TELA ENTRADA -->
+<!-- 📦 TELA ENTRADA -->
 <div id="tela-entrada" class="screen">
   <h2 class="sub-title">Registro de Entrada</h2>
-  <p class="data-display">⚙️ Esta tela será usada apenas para consulta visual no futuro. O cadastro é feito via formulário principal.</p>
+  <p class="data-display">
+    🧾 Aqui serão exibidas as entradas registradas automaticamente pela integração com o Power Automate.
+  </p>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Código de Fábrica</th>
+        <th>Descrição</th>
+        <th>Quantidade</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody id="tabela-entradas">
+      <tr><td colspan="4" style="text-align:center;">(Em breve — integração com SharePoint)</td></tr>
+    </tbody>
+  </table>
   <div class="form-actions"><button id="btn-voltar-entrada" class="action-button secondary">Voltar</button></div>
 </div>
 
-<!-- TELA SAÍDA -->
+<!-- 🚚 TELA SAÍDA -->
 <div id="tela-saida" class="screen">
   <h2 class="sub-title">Registro de Saída</h2>
-  <p class="data-display">⚙️ Esta funcionalidade está em desenvolvimento para integração futura.</p>
+  <p class="data-display">
+    🚛 As saídas também serão processadas automaticamente. Aqui ficará o histórico de retiradas.
+  </p>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Cód. Fábrica</th>
+        <th>Descrição</th>
+        <th>Qtd. Saída</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody id="tabela-saidas">
+      <tr><td colspan="4" style="text-align:center;">(Em breve — integração com SharePoint)</td></tr>
+    </tbody>
+  </table>
   <div class="form-actions"><button id="btn-voltar-saida" class="action-button secondary">Voltar</button></div>
 </div>
 
-<!-- TELA SALDO -->
+<!-- 📊 TELA SALDO -->
 <div id="tela-saldo" class="screen">
   <h2 class="sub-title">Consulta de Saldo</h2>
-  <p class="data-display">📦 A consulta de saldo será automatizada com base nas listas de Entradas e Saídas.</p>
+  <p class="data-display">📦 Aqui você poderá consultar o saldo de cada produto automaticamente com base nas Entradas e Saídas.</p>
   <div class="form-actions"><button id="btn-voltar-saldo" class="action-button secondary">Voltar</button></div>
 </div>
 
 <script>
-// ======== CONTROLE DE TELAS ======== //
+// ======== CONTROLE DE NAVEGAÇÃO ======== //
 document.addEventListener("DOMContentLoaded", () => {
   const telas = document.querySelectorAll(".screen");
   function mostrarTela(id){
@@ -140,63 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-voltar-saida").onclick=()=>mostrarTela("tela-principal");
   document.getElementById("btn-voltar-saldo").onclick=()=>mostrarTela("tela-principal");
 });
-
-// ======== INTEGRAÇÃO COM MICROSOFT FORMS ======== //
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("form-cadastro");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const dados = {
-      "Código de Fábrica": document.getElementById("codigoFabrica").value.trim(),
-      "Código do Fornecedor": document.getElementById("codigoFornecedor").value.trim(),
-      "Descrição do Produto": document.getElementById("descricaoProduto").value.trim(),
-      "Nome do Fornecedor": document.getElementById("nomeFornecedor").value.trim(),
-      "Unidade de Medida": document.getElementById("unidadeMedida").value.trim()
-    };
-
-    if (Object.values(dados).some(v => v === "")) {
-      alert("⚠️ Preencha todos os campos antes de enviar.");
-      return;
-    }
-
-    alert("✅ Dados prontos para envio. O formulário do Microsoft Forms será aberto para envio oficial.");
-    window.open("https://forms.microsoft.com/r/cYKFvRQbRV", "_blank");
-    form.reset();
-  });
-});
-</script>
-  <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const telas = document.querySelectorAll(".screen");
-  const btnCadastro = document.getElementById("btn-cadastro");
-  const btnVoltarCadastro = document.getElementById("btn-voltar-cadastro");
-  const btnAbrirForms = document.getElementById("btn-abrir-forms");
-  const iframeContainer = document.getElementById("iframe-container");
-  const iframeForms = document.getElementById("iframe-forms");
-
-  // Função para alternar telas
-  function mostrarTela(id) {
-    telas.forEach(t => t.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-  }
-
-  btnCadastro.onclick = () => mostrarTela("tela-cadastro");
-  btnVoltarCadastro.onclick = () => {
-    iframeContainer.style.display = "none";
-    iframeForms.src = "";
-    mostrarTela("tela-principal");
-  };
-
-  btnAbrirForms.onclick = () => {
-    const formURL = "https://forms.office.com/r/cYKFvRQbRV"; // seu link do Forms
-    iframeForms.src = formURL;
-    iframeContainer.style.display = "block";
-  };
-});
 </script>
 
 </body>
 </html>
-
-
