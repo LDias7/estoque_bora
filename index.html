@@ -166,6 +166,37 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const telas = document.querySelectorAll(".screen");
+  const btnCadastro = document.getElementById("btn-cadastro");
+  const btnVoltarCadastro = document.getElementById("btn-voltar-cadastro");
+  const btnAbrirForms = document.getElementById("btn-abrir-forms");
+  const iframeContainer = document.getElementById("iframe-container");
+  const iframeForms = document.getElementById("iframe-forms");
+
+  // Função para alternar telas
+  function mostrarTela(id) {
+    telas.forEach(t => t.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  btnCadastro.onclick = () => mostrarTela("tela-cadastro");
+  btnVoltarCadastro.onclick = () => {
+    iframeContainer.style.display = "none";
+    iframeForms.src = "";
+    mostrarTela("tela-principal");
+  };
+
+  btnAbrirForms.onclick = () => {
+    const formURL = "https://forms.office.com/r/cYKFvRQbRV"; // seu link do Forms
+    iframeForms.src = formURL;
+    iframeContainer.style.display = "block";
+  };
+});
+</script>
+
 </body>
 </html>
+
 
