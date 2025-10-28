@@ -18,5 +18,9 @@
         },
         {
           "key": "X-Frame-Options",
-          "value": "ALLOW-FROM
+          "value": "ALLOW-FROM https://*.sharepoint.com"
         }
+      ]
+    }
+  ]
+}
