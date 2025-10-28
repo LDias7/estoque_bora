@@ -16,59 +16,26 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding-top:60px;}
 .main-header{width:100%;background:var(--cor-primaria);color:var(--cor-secundaria);text-align:center;padding:20px 0;position:fixed;top:0;left:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,0.2);}
-.screen{background:var(--cor-secundaria);padding:40px;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.1);width:90%;max-width:900px;margin-top:100px;margin-bottom:40px;display:none;position:relative;}
+.screen{background:var(--cor-secundaria);padding:40px;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.1);width:90%;max-width:900px;margin-top:100px;margin-bottom:40px;display:none;}
 .screen.active{display:block;}
 .sub-title{text-align:center;color:var(--cor-primaria);margin-bottom:25px;}
 .button-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .main-button{background:var(--cor-primaria);color:var(--cor-secundaria);border:none;padding:25px 15px;font-size:1.2em;font-weight:bold;border-radius:6px;cursor:pointer;transition:.3s;}
 .main-button:hover{background:#003366;}
-.data-display{background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:4px;margin-bottom:20px;border-left:5px solid var(--cor-primaria);}
-.large-text{font-size:1.6em;font-weight:bold;}
-iframe{
-  border:none;
-  width:100%;
-  height:800px;
-  border-radius:8px;
-  overflow:hidden;
-}
-.forms-wrap{
-  position:relative;
-  overflow:hidden;
-  border:2px solid #002855;
-  border-radius:8px;
-}
-.forms-wrap .mask-bottom{
-  display:none;
-}
-
-/* 🔹 Botão flutuante fixo no canto inferior direito */
-.btn-flutuante{
-  position:fixed;
-  bottom:30px;
-  right:30px;
-  background:var(--cor-primaria);
-  color:white;
-  border:none;
-  padding:15px 25px;
-  border-radius:50px;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,0.25);
-  transition:0.3s;
-  z-index:999;
-}
-.btn-flutuante:hover{
-  background:#003366;
-}
+iframe{border:none;width:100%;height:800px;border-radius:8px;overflow:hidden;}
+.forms-wrap{border:2px solid #002855;border-radius:8px;overflow:hidden;}
+.btn-flutuante{position:fixed;bottom:30px;right:30px;background:var(--cor-primaria);color:white;border:none;padding:15px 25px;border-radius:50px;font-weight:bold;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.25);transition:0.3s;z-index:999;}
+.btn-flutuante:hover{background:#003366;}
+.saldo-input{width:100%;padding:15px;border:2px solid var(--cor-primaria);border-radius:8px;font-size:1.1em;margin-bottom:20px;transition:.3s;}
+.saldo-input:focus{outline:none;box-shadow:0 0 5px var(--cor-primaria);}
+.resultado-saldo{background:#f8f9fa;border-left:5px solid var(--cor-primaria);padding:20px;border-radius:8px;}
 </style>
-
-
 </head>
 
 <body>
-<header class="main-header"><h1>Sistema de Gestão de Estoque - Bora Transportes</h1></header>
+<header class="main-header"><h1>Sistema de Gestão de Estoque</h1></header>
 
-<!-- 🏠 TELA PRINCIPAL -->
+<!-- MENU PRINCIPAL -->
 <main id="tela-principal" class="screen active">
   <h2 class="sub-title">Selecione uma Opção</h2>
   <div class="button-grid">
@@ -79,119 +46,93 @@ iframe{
   </div>
 </main>
 
-<!-- 📋 TELA CADASTRO -->
+<!-- CADASTRO -->
 <div id="tela-cadastro" class="screen">
   <h2 class="sub-title">Cadastro de Produto</h2>
   <div class="forms-wrap">
-    <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxURTRUMlpWNDQ2VTJJWUM0T05BTkVGRUdDRy4u&embed=true"></iframe>
-    <div class="mask-bottom"></div>
+    <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxURTRUMlpWNDQ2VTJJWUM0T05BTkVGRUdDRy4u&embed=true" allowfullscreen></iframe>
   </div>
-  <div class="form-actions"><button id="btn-voltar-cadastro" class="btn-flutuante">Voltar</button>
-</div>
+  <button id="btn-voltar-cadastro" class="btn-flutuante">← Voltar</button>
 </div>
 
-<!-- 📦 TELA ENTRADA -->
+<!-- ENTRADA -->
 <div id="tela-entrada" class="screen">
   <h2 class="sub-title">Registro de Entrada</h2>
   <div class="forms-wrap">
-    <iframe src="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUODg1NjJLTEYzOFRaVjlGMFEwWDJVSEVWWi4u&embed=true"></iframe>
-    <div class="mask-bottom"></div>
+    <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUODg1NjJLTEYzOFRaVjlGMFEwWDJVSEVWWi4u&embed=true" allowfullscreen></iframe>
   </div>
-  <div class="form-actions"><button id="btn-voltar-cadastro" class="btn-flutuante">Voltar</button>
-</div>
+  <button id="btn-voltar-entrada" class="btn-flutuante">← Voltar</button>
 </div>
 
-<!-- 🚚 TELA SAÍDA -->
+<!-- SAÍDA -->
 <div id="tela-saida" class="screen">
   <h2 class="sub-title">Registro de Saída</h2>
   <div class="forms-wrap">
-    <iframe src="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUMEg4TTdMVVJaUktJTlpPR1NCQjBITllISS4u&embed=true"></iframe>
-    <div class="mask-bottom"></div>
+    <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUMEg4TTdMVVJaUktJTlpPR1NCQjBITllISS4u&embed=true" allowfullscreen></iframe>
   </div>
-  <div class="form-actions"><button id="btn-voltar-cadastro" class="btn-flutuante">Voltar</button>
-</div>
+  <button id="btn-voltar-saida" class="btn-flutuante">← Voltar</button>
 </div>
 
-<!-- 📊 TELA SALDO -->
+<!-- SALDO -->
 <div id="tela-saldo" class="screen">
   <h2 class="sub-title">Consulta de Saldo</h2>
-  <div class="form-group">
-    <label for="buscaProduto">Buscar por Código de Fábrica ou Descrição:</label>
-    <input type="text" id="buscaProduto" placeholder="Digite o código ou descrição do produto...">
+  <input type="text" id="campo-busca" class="saldo-input" placeholder="🔍 Digite o código de fábrica ou descrição do produto...">
+  <div id="resultado-saldo" class="resultado-saldo">
+    <p><strong>Produto:</strong> —</p>
+    <p><strong>Código de Fábrica:</strong> —</p>
+    <p><strong>Saldo Atual:</strong> —</p>
   </div>
-  <div class="data-display" id="resultado-saldo">
-    🔍 Nenhum produto selecionado.
-  </div>
-  <div class="form-actions"><button id="btn-voltar-cadastro" class="btn-flutuante">Voltar</button>
-</div>
+  <button id="btn-voltar-saldo" class="btn-flutuante">← Voltar</button>
 </div>
 
 <script>
+// ======== TROCA DE TELAS ======== //
 document.addEventListener("DOMContentLoaded", () => {
   const telas = document.querySelectorAll(".screen");
-  function mostrarTela(id){
-    telas.forEach(t=>t.classList.remove("active"));
+  const mostrarTela = id => {
+    telas.forEach(t => t.classList.remove("active"));
     document.getElementById(id).classList.add("active");
     window.scrollTo(0,0);
-  }
-  document.getElementById("btn-cadastro").onclick=()=>mostrarTela("tela-cadastro");
-  document.getElementById("btn-entrada").onclick=()=>mostrarTela("tela-entrada");
-  document.getElementById("btn-saida").onclick=()=>mostrarTela("tela-saida");
-  document.getElementById("btn-saldo").onclick=()=>mostrarTela("tela-saldo");
-  document.getElementById("btn-voltar-cadastro").onclick=()=>mostrarTela("tela-principal");
-  document.getElementById("btn-voltar-entrada").onclick=()=>mostrarTela("tela-principal");
-  document.getElementById("btn-voltar-saida").onclick=()=>mostrarTela("tela-principal");
-  document.getElementById("btn-voltar-saldo").onclick=()=>mostrarTela("tela-principal");
+  };
+  document.getElementById("btn-cadastro").onclick = () => mostrarTela("tela-cadastro");
+  document.getElementById("btn-entrada").onclick = () => mostrarTela("tela-entrada");
+  document.getElementById("btn-saida").onclick = () => mostrarTela("tela-saida");
+  document.getElementById("btn-saldo").onclick = () => mostrarTela("tela-saldo");
+  document.getElementById("btn-voltar-cadastro").onclick = () => mostrarTela("tela-principal");
+  document.getElementById("btn-voltar-entrada").onclick = () => mostrarTela("tela-principal");
+  document.getElementById("btn-voltar-saida").onclick = () => mostrarTela("tela-principal");
+  document.getElementById("btn-voltar-saldo").onclick = () => mostrarTela("tela-principal");
 
-  // ======== CONSULTA DE SALDO ======== //
-  const SP_SITE = "https://borexpress.sharepoint.com/sites/EstoqueJC";
-  const inputBusca = document.getElementById("buscaProduto");
-  const display = document.getElementById("resultado-saldo");
-
-  inputBusca.addEventListener("input", async ()=>{
-    const termo = inputBusca.value.trim();
-    if(termo === ""){
-      display.textContent = "🔍 Nenhum produto selecionado.";
-      return;
-    }
-
+  // ======== CONSULTA DE SALDO (SharePoint) ======== //
+  const campoBusca = document.getElementById("campo-busca");
+  const resultado = document.getElementById("resultado-saldo");
+  campoBusca.addEventListener("input", async () => {
+    const termo = campoBusca.value.trim();
+    if (termo.length < 2) return;
     try {
-      const produto = await buscarProduto(SP_SITE, termo);
-      if(!produto){ display.textContent="❌ Produto não encontrado."; return; }
+      const produtos = await fetch("/api/sharepoint?lista=Produtos&filtro=" + encodeURIComponent(termo)).then(r=>r.json());
+      const entradas = await fetch("/api/sharepoint?lista=Entrada&filtro=" + encodeURIComponent(termo)).then(r=>r.json());
+      const saidas = await fetch("/api/sharepoint?lista=Saidas&filtro=" + encodeURIComponent(termo)).then(r=>r.json());
 
-      const entradas = await somarLista(SP_SITE, "Entrada", produto.Title);
-      const saidas = await somarLista(SP_SITE, "Saídas", produto.Title);
-      const saldo = entradas - saidas;
+      if (!produtos.length) {
+        resultado.innerHTML = "<p>❌ Produto não encontrado.</p>";
+        return;
+      }
+      const produto = produtos[0];
+      const totalEntradas = entradas.reduce((s,e)=>s+Number(e.Quantidade||0),0);
+      const totalSaidas = saidas.reduce((s,e)=>s+Number(e.Quantidade||0),0);
+      const saldo = totalEntradas - totalSaidas;
 
-      display.innerHTML = `
-        <strong>Produto:</strong> ${produto.DescricaoProduto || "-"}<br>
-        <strong>Cód. Fábrica:</strong> ${produto.Title}<br>
-        <strong>Fornecedor:</strong> ${produto.CodigoFornecedor || "-"}<br>
-        <strong>Saldo Atual:</strong> <span class="large-text">${saldo}</span> ${produto.UnidadeMedida || ""}
+      resultado.innerHTML = `
+        <p><strong>Produto:</strong> ${produto.DescricaoProduto || "—"}</p>
+        <p><strong>Código de Fábrica:</strong> ${produto.Title || "—"}</p>
+        <p><strong>Saldo Atual:</strong> ${saldo} ${produto.UnidadeMedida || ""}</p>
       `;
-    } catch(e){
-      display.textContent = "Erro ao buscar saldo.";
-      console.error(e);
+    } catch(err){
+      resultado.innerHTML = "<p>⚠️ Erro ao buscar saldo.</p>";
     }
   });
-
-  async function buscarProduto(site, termo){
-    const filter = `$filter=(Title eq '${termo}' or CodigoFornecedor eq '${termo}' or substringof('${termo}',DescricaoProduto))`;
-    const url = `${site}/_api/web/lists/getbytitle('Produtos')/items?${filter}`;
-    const r = await fetch(url,{headers:{"Accept":"application/json;odata=nometadata"},credentials:"include"});
-    const d = await r.json();
-    return d.value && d.value[0];
-  }
-  async function somarLista(site, lista, codFab){
-    const url = `${site}/_api/web/lists/getbytitle('${lista}')/items?$filter=Title eq '${codFab}'`;
-    const r = await fetch(url,{headers:{"Accept":"application/json;odata=nometadata"},credentials:"include"});
-    const d = await r.json();
-    return d.value ? d.value.reduce((acc,i)=>acc+Number(i.Quantidade||0),0) : 0;
-  }
 });
 </script>
 </body>
 </html>
-
-
-
