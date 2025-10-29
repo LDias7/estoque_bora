@@ -3,64 +3,153 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sistema de Estoque - BORA Transportes</title>
+<title>Sistema Gestão de Estoque - BORA Transportes</title>
 <style>
-  :root{
-    --bg:#f4f7fb;--text:#222;--primary:#1f4e8c;--panel:#fff;--sub:#e6edf5;--border:#d9e2ef;
-    --btn:#1f4e8c;--btnHover:#2b6cb0;--export:#0078d4;--exportHover:#005a9e;--muted:#555;
+  :root {
+    --bg: #f4f7fb;
+    --text: #222;
+    --primary: #1f4e8c;
+    --panel: #fff;
+    --sub: #e6edf5;
+    --border: #d9e2ef;
+    --btn: #1f4e8c;
+    --btnHover: #2b6cb0;
+    --export: #0078d4;
+    --exportHover: #005a9e;
+    --muted: #555;
   }
-  body.dark{
-    --bg:#121212;--text:#e5e5e5;--primary:#3a7bd5;--panel:#1f1f1f;--sub:#1b1b1b;--border:#2c2c2c;
-    --btn:#3a7bd5;--btnHover:#2f6bb8;--export:#2f86e5;--exportHover:#1f6ec2;--muted:#c7c7c7;
+  body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
   }
-  /* base */
-  html,body{height:100%}
-  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-  /* HOME (somente botões centrais) */
-  #home{
-    min-height:100vh;display:grid;place-items:center;background:var(--sub);
+
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 22px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
   }
-  .grid-buttons{
-    display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:18px;
-    width:min(680px,90%);margin:auto;
+
+  /* Tela inicial */
+  #home {
+    min-height: calc(100vh - 80px);
+    display: grid;
+    place-items: center;
+    background: var(--sub);
   }
-  .grid-buttons button{
-    padding:18px 32px;border:0;border-radius:12px;background:var(--btn);color:#fff;
-    font-size:22px;font-weight:700;cursor:pointer;
+  .grid-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 18px;
+    width: min(680px, 90%);
+    margin: auto;
   }
-  .grid-buttons button:hover{background:var(--btnHover)}
-  /* PÁGINAS (Histórico / Saldo) */
-  .page{display:none;max-width:1200px;margin:26px auto;background:var(--panel);border:1px solid var(--border);
-        padding:26px;border-radius:12px;box-shadow:0 3px 12px rgba(0,0,0,.08)}
-  .page.active{display:block}
-  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-  .topbar h2{margin:0;color:var(--primary);font-size:28px}
-  .right{margin-left:auto}
-  .btn{padding:12px 18px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-weight:700;cursor:pointer;font-size:16px}
-  .btn:hover{background:var(--btnHover)}
-  .btn-grey{background:#888}.btn-grey:hover{background:#6f6f6f}
-  .btn-export{background:var(--export)}.btn-export:hover{background:var(--exportHover)}
-  .theme{background:#fff;color:var(--primary)} .theme:hover{background:#ddd}
-  /* controles */
-  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}
-  select,input[type="text"]{font-size:16px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text)}
-  /* tabela */
-  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:17px}
-  th,td{border:1px solid var(--border);padding:10px;text-align:left}
-  th{background:var(--sub)}
-  /* mensagem de ajuda */
-  .hint{color:var(--muted);font-size:14px}
-  /* esconder na home */
-  .only-pages{display:none}
-  .page.active .only-pages{display:inline-flex}
+  .grid-buttons button {
+    padding: 18px 32px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--btn);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .grid-buttons button:hover {
+    background: var(--btnHover);
+  }
+
+  /* Páginas internas */
+  .page {
+    display: none;
+    max-width: 1200px;
+    margin: 26px auto;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 26px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  }
+  .page.active {
+    display: block;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .topbar h2 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 28px;
+  }
+  .right {
+    margin-left: auto;
+  }
+
+  .btn {
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--btn);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .btn:hover {
+    background: var(--btnHover);
+  }
+  .btn-grey {
+    background: #888;
+  }
+  .btn-grey:hover {
+    background: #6f6f6f;
+  }
+  .btn-export {
+    background: var(--export);
+  }
+  .btn-export:hover {
+    background: var(--exportHover);
+  }
+
+  /* Tabelas */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 17px;
+  }
+  th,
+  td {
+    border: 1px solid var(--border);
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background: var(--sub);
+  }
+  .hint {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .page.active .only-pages {
+    display: inline-flex;
+  }
 </style>
 </head>
 <body>
 
-<!-- HOME: apenas os botões centrais -->
-<section id="home" aria-label="Início">
+<header>Sistema Gestão de Estoque</header>
+
+<!-- TELA INICIAL -->
+<section id="home">
   <div class="grid-buttons">
-    <button onclick="mostrar('home')">Início</button>
     <button onclick="abrirForm('cadastro')">Cadastro</button>
     <button onclick="abrirForm('entrada')">Entrada</button>
     <button onclick="abrirForm('saida')">Saída</button>
@@ -70,11 +159,10 @@
 </section>
 
 <!-- HISTÓRICO -->
-<section id="historico" class="page" aria-label="Histórico">
+<section id="historico" class="page">
   <div class="topbar">
     <button class="btn btn-grey only-pages" onclick="mostrar('home')">Início</button>
     <h2>Histórico</h2>
-    <button id="toggleThemeH" class="btn theme only-pages right" onclick="toggleTheme()">Modo Escuro</button>
   </div>
 
   <div class="toolbar">
@@ -96,11 +184,10 @@
 </section>
 
 <!-- SALDO -->
-<section id="saldo" class="page" aria-label="Saldo">
+<section id="saldo" class="page">
   <div class="topbar">
     <button class="btn btn-grey only-pages" onclick="mostrar('home')">Início</button>
     <h2>Saldo de Produtos</h2>
-    <button id="toggleThemeS" class="btn theme only-pages right" onclick="toggleTheme()">Modo Escuro</button>
   </div>
 
   <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:var(--primary)">Total de produtos: 0 | Soma total de estoque: 0</div>
@@ -129,185 +216,70 @@
 </section>
 
 <script>
-/* ================== CONFIG ================== */
-/* Cole aqui os links públicos dos CSVs quando tiver: */
-const CSV_URL_ENTRADAS = "";  // ex: "https://.../Entradas.csv"
-const CSV_URL_SAIDAS   = "";  // ex: "https://.../Saidas.csv"
-const CSV_URL_PRODUTOS = "";  // ex: "https://.../Produtos.csv"
+/* === CONFIG === */
+const CSV_URL_ENTRADAS = "https://borexpress.sharepoint.com/:x:/s/EstoqueJC/EYdpGZ5KeV1PnpowpLI5mEMBjHMFwcjwvYCmTFWmFcqdqA?e=dZb8Db";
+const CSV_URL_SAIDAS   = "https://borexpress.sharepoint.com/:x:/s/EstoqueJC/EUj_pkX-AdBDnZwgibvUmnQBRVjVRzgzQm8PygwMJpXJpg?e=eMLMTa";
+const CSV_URL_PRODUTOS = "https://borexpress.sharepoint.com/:x:/s/EstoqueJC/EVD9DObRZR9KkNfSRGaQAtkBZs8BA2vudoJaSynZXEcHUQ?e=Uz6hdC";
 
-/* Links dos Forms oficiais (abrem em nova aba) */
 const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
 const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
 
-/* NÃO altere mais nada abaixo a menos que queira customizar lógica */
-
-/* ================== TEMA (CLARO/ESCURO) ================== */
-(function initTheme(){
-  const saved = localStorage.getItem('theme') || 'light';
-  if(saved==='dark') document.body.classList.add('dark');
-  updateThemeButtons();
-})();
-function toggleTheme(){
-  document.body.classList.toggle('dark');
-  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-  updateThemeButtons();
-}
-function updateThemeButtons(){
-  const txt = document.body.classList.contains('dark') ? 'Modo Claro' : 'Modo Escuro';
-  const btnH = document.getElementById('toggleThemeH'); if(btnH) btnH.textContent = txt;
-  const btnS = document.getElementById('toggleThemeS'); if(btnS) btnS.textContent = txt;
-}
-
-/* ================== NAVEGAÇÃO ================== */
+/* === NAVEGAÇÃO === */
 function mostrar(id){
-  // alterna seções
   document.getElementById('home').style.display = (id==='home') ? 'grid' : 'none';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   if(id!=='home') document.getElementById(id).classList.add('active');
-
-  // ações ao entrar
   if(id==='historico') mudarHistorico();
   if(id==='saldo') carregarProdutos();
-  updateThemeButtons();
 }
 function abrirForm(tipo){
-  if(tipo==='cadastro') window.open(FORM_CAD,'_blank','noopener');
-  if(tipo==='entrada')  window.open(FORM_ENTRADA,'_blank','noopener');
-  if(tipo==='saida')    window.open(FORM_SAIDA,'_blank','noopener');
+  if(tipo==='cadastro') window.open(FORM_CAD,'_blank');
+  if(tipo==='entrada')  window.open(FORM_ENTRADA,'_blank');
+  if(tipo==='saida')    window.open(FORM_SAIDA,'_blank');
 }
 
-/* ================== CSV UTILS ================== */
-async function fetchCSV(url){
-  const r = await fetch(url, { cache: 'no-store' });
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  return await r.text();
-}
-function parseCSV(text){
-  // parser simples que lida com vírgulas e aspas
-  const lines = text.replace(/\r/g,'').split('\n').filter(l=>l.trim().length);
-  const header = splitCSVLine(lines[0]).map(h=>h.trim());
-  return lines.slice(1).map(line=>{
-    const cols = splitCSVLine(line); const obj={};
-    header.forEach((h,i)=> obj[h] = (cols[i]??'').trim() );
-    return obj;
-  });
-}
-function splitCSVLine(line){
-  const out=[], re=/\s*(?:"([^"]*(?:""[^"]*)*)"|([^,]*))\s*(?:,|$)/g; let m;
-  while((m=re.exec(line))!==null){ out.push(m[1]?m[1].replace(/""/g,'"'):(m[2]||'')); }
-  return out;
-}
-const fmtBR = n => Number(n).toLocaleString('pt-BR',{maximumFractionDigits:2});
+/* === CSV FUNÇÕES === */
+async function fetchCSV(url){ const r=await fetch(url,{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); return await r.text();}
+function parseCSV(t){const l=t.replace(/\r/g,'').split('\n').filter(x=>x.trim());const h=l.shift().split(',');return l.map(v=>{const c=v.split(',');const o={};h.forEach((x,i)=>o[x]=c[i]);return o;});}
+const fmtBR=n=>Number(n).toLocaleString('pt-BR',{maximumFractionDigits:2});
 
-/* ================== HISTÓRICO ================== */
+/* === HISTÓRICO === */
 let HIST_CACHE=[];
-function urlsOkHistorico(tipo){
-  if(tipo==='entrada' && !CSV_URL_ENTRADAS) return false;
-  if(tipo==='saida'   && !CSV_URL_SAIDAS)   return false;
-  return true;
-}
 async function mudarHistorico(){
-  const tipo = document.getElementById('tipoHistorico').value;
-  const th = document.querySelector('#tabelaHistorico thead');
-  const tb = document.querySelector('#tabelaHistorico tbody');
-  const hint = document.getElementById('hintHistorico');
-  th.innerHTML=""; tb.innerHTML=""; hint.textContent="";
-
-  if(tipo==='entrada'){
-    th.innerHTML="<tr><th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th><th>Atualização</th></tr>";
-  } else {
-    th.innerHTML="<tr><th>Título</th><th>Descrição Produto</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th><th>Atualização</th></tr>";
-  }
-
-  if(!urlsOkHistorico(tipo)){
-    hint.textContent = "Cole o link CSV de " + (tipo==='entrada'?'Entradas':'Saídas') + " no topo do script para exibir dados reais.";
-    document.getElementById('infoHistorico').textContent = "Registros: 0";
-    return;
-  }
-  carregarHistorico(tipo);
-}
-async function carregarHistorico(tipo){
-  const url = (tipo==='entrada') ? CSV_URL_ENTRADAS : CSV_URL_SAIDAS;
-  const tb = document.querySelector('#tabelaHistorico tbody');
-  const hint = document.getElementById('hintHistorico');
-  try{
-    const csv = await fetchCSV(url);
-    HIST_CACHE = parseCSV(csv);
-    renderHistorico(tipo);
-    hint.textContent = "";
-  }catch(e){
-    HIST_CACHE = [];
-    renderHistorico(tipo);
-    hint.textContent = "Não foi possível carregar o CSV. Verifique o link público no SharePoint.";
-  }
+  const tipo=document.getElementById('tipoHistorico').value;
+  const th=document.querySelector('#tabelaHistorico thead');
+  th.innerHTML = tipo==='entrada'?
+  "<tr><th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th><th>Atualização</th></tr>":
+  "<tr><th>Título</th><th>Descrição Produto</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th><th>Atualização</th></tr>";
+  const url = tipo==='entrada'?CSV_URL_ENTRADAS:CSV_URL_SAIDAS;
+  try{const csv=await fetchCSV(url);HIST_CACHE=parseCSV(csv);renderHistorico(tipo);}catch(e){document.getElementById('hintHistorico').textContent='Erro ao carregar CSV.';}
 }
 function renderHistorico(tipo){
-  const tb=document.querySelector('#tabelaHistorico tbody'); tb.innerHTML="";
-  const f=(document.getElementById('filtroHistorico').value||'').toLowerCase();
-  let count=0;
-  HIST_CACHE.filter(r=>!f||Object.values(r).some(v=>String(v).toLowerCase().includes(f))).forEach(i=>{
-    const tr=document.createElement('tr');
-    if(tipo==='entrada'){
-      tr.innerHTML=`<td>${i.Title||''}</td><td>${i.Quantidade||''}</td><td>${i.ValorUnitario||''}</td>
-                    <td>${i.ValorTotal||''}</td><td>${i.NotaFiscal||''}</td><td>${i.Modified||''}</td>`;
-    }else{
-      tr.innerHTML=`<td>${i.Title||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.Quantidade||''}</td>
-                    <td>${i.PlacaCaminhao||''}</td><td>${i.Destinatario||''}</td><td>${i.Modified||''}</td>`;
-    }
-    tb.appendChild(tr); count++;
-  });
-  document.getElementById('infoHistorico').textContent = `Registros: ${count}`;
-}
-function recarregarHistorico(){ mudarHistorico(); }
-document.getElementById('filtroHistorico').addEventListener('input', ()=>renderHistorico(document.getElementById('tipoHistorico').value));
+  const f=(document.getElementById('filtroHistorico').value||'').toLowerCase();const tb=document.querySelector('#tabelaHistorico tbody');tb.innerHTML='';
+  let c=0;HIST_CACHE.filter(r=>!f||Object.values(r).some(v=>String(v).toLowerCase().includes(f))).forEach(i=>{const tr=document.createElement('tr');
+  if(tipo==='entrada'){tr.innerHTML=`<td>${i.Title||''}</td><td>${i.Quantidade||''}</td><td>${i.ValorUnitario||''}</td><td>${i.ValorTotal||''}</td><td>${i.NotaFiscal||''}</td><td>${i.Modified||''}</td>`;}
+  else{tr.innerHTML=`<td>${i.Title||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.Quantidade||''}</td><td>${i.PlacaCaminhao||''}</td><td>${i.Destinatario||''}</td><td>${i.Modified||''}</td>`;}tb.appendChild(tr);c++;});
+  document.getElementById('infoHistorico').textContent=`Registros: ${c}`;}
+function recarregarHistorico(){mudarHistorico();}
+document.getElementById('filtroHistorico').addEventListener('input',()=>renderHistorico(document.getElementById('tipoHistorico').value));
 
-/* ================== SALDO ================== */
+/* === SALDO === */
 let PROD_CACHE=[];
-function urlOkSaldo(){ return !!CSV_URL_PRODUTOS; }
-
 async function carregarProdutos(){
-  const hint = document.getElementById('hintSaldo');
-  if(!urlOkSaldo()){
-    PROD_CACHE=[]; renderSaldo(PROD_CACHE);
-    hint.textContent = "Cole o link CSV de Produtos no topo do script para exibir dados reais.";
-    return;
-  }
-  try{
-    const csv = await fetchCSV(CSV_URL_PRODUTOS);
-    PROD_CACHE = parseCSV(csv);
-    renderSaldo(PROD_CACHE);
-    hint.textContent = "";
-  }catch(e){
-    PROD_CACHE=[]; renderSaldo(PROD_CACHE);
-    hint.textContent = "Não foi possível carregar o CSV. Verifique o link público no SharePoint.";
-  }
+  try{const csv=await fetchCSV(CSV_URL_PRODUTOS);PROD_CACHE=parseCSV(csv);renderSaldo(PROD_CACHE);}catch(e){document.getElementById('hintSaldo').textContent='Erro ao carregar CSV.';}
 }
 function renderSaldo(rows){
-  const tb=document.querySelector('#tableSaldo tbody'); tb.innerHTML="";
-  let soma=0;
-  rows.forEach(i=>{
-    const saldo = Number((i.SaldoAtual||"").toString().replace(',','.')) || 0;
-    soma += saldo;
-    const tr=document.createElement('tr');
-    tr.innerHTML = `<td>${i.Title||''}</td><td>${i.CodigoFornecedor||''}</td><td>${i.DescricaoProduto||''}</td>
-                    <td>${i.NomeFornecedor||''}</td><td>${i.UnidadeMedida||''}</td>
-                    <td>${fmtBR(saldo)}</td><td>${i.DataAtualizacao||''}</td>`;
-    tb.appendChild(tr);
-  });
-  document.getElementById('saldoInfo').textContent = `Itens: ${rows.length}`;
-  document.getElementById('resumoSaldo').textContent = `Total de produtos: ${rows.length} | Soma total de estoque: ${fmtBR(soma)}`;
-}
+  const tb=document.querySelector('#tableSaldo tbody');tb.innerHTML='';let soma=0;
+  rows.forEach(i=>{const s=Number((i.SaldoAtual||'').replace(',','.'))||0;soma+=s;tb.innerHTML+=`<tr><td>${i.Title||''}</td><td>${i.CodigoFornecedor||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.NomeFornecedor||''}</td><td>${i.UnidadeMedida||''}</td><td>${fmtBR(s)}</td><td>${i.DataAtualizacao||''}</td></tr>`;});
+  document.getElementById('saldoInfo').textContent=`Itens: ${rows.length}`;document.getElementById('resumoSaldo').textContent=`Total de produtos: ${rows.length} | Soma total de estoque: ${fmtBR(soma)}`;}
 function exportarCSV(){
-  const table=document.getElementById('tableSaldo');
-  const rows=[...table.rows].map(tr=>[...tr.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
-  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  const rows=[...document.querySelectorAll('#tableSaldo tr')].map(r=>[...r.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
 
-/* ================== START ================== */
-(function init(){ mostrar('home'); })();
+/* === INIT === */
+mostrar('home');
 </script>
 </body>
 </html>
