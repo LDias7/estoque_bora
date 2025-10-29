@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sistema de Estoque - BORA (Forms + CSV)</title>
+<title>Sistema de Estoque - BORA Transportes</title>
 <style>
   body{font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;margin:0;color:#222}
   header{background:#1f4e8c;color:#fff;padding:16px;text-align:center}
@@ -13,21 +13,15 @@
   section{display:none;max-width:1100px;margin:18px auto;background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
   section.active{display:block}
   h2{color:#1f4e8c;margin:0 0 12px}
-  label{display:block;margin-top:10px;font-weight:700}
-  input,select{width:100%;padding:8px;border:1px solid #cdd7e3;border-radius:6px;box-sizing:border-box}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-  .col-3{flex:1 1 300px}
   table{width:100%;border-collapse:collapse;margin-top:14px}
   th,td{border:1px solid #d9e2ef;padding:8px;text-align:left;font-size:14px}
   th{background:#f2f6fc}
   .muted{color:#667da0;font-size:13px}
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-  .pill{background:#eef4ff;color:#244c8a;border:1px solid #cfe0ff;border-radius:999px;padding:6px 10px;font-size:12px}
   .right{margin-left:auto}
   .filters-row input{width:100%;padding:6px;font-size:12px}
-  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .card{background:#f7f9fe;border:1px solid #e5ecf7;border-radius:8px;padding:10px}
-  .warn{color:#8a2424}
+  .btn-exportar{background-color:#0078d4;color:white;border:none;padding:8px 14px;border-radius:6px;font-weight:bold;cursor:pointer}
+  .btn-exportar:hover{background-color:#005a9e}
 </style>
 </head>
 <body>
@@ -42,56 +36,36 @@
   <button onclick="mostrar('saldo')">Saldo</button>
 </nav>
 
-<!-- INFO -->
-<section id="home" class="active">
-  <h2>Bem-vindo</h2>
-  <p>Fluxo oficial: <b>Microsoft Forms</b> → <b>Power Automate</b> → <b>SharePoint</b>. <br>
-  Este front na Vercel: abre os Forms oficiais para lançar dados e exibe <b>Histórico</b> e <b>Saldo</b> a partir de CSV público (ou dados mock para teste).</p>
-  <p class="muted">Dica: publique três CSVs (Entradas, Saídas, Produtos) e cole as URLs no topo do script para usar dados reais.</p>
-</section>
+<!-- HOME LIMPA -->
+<section id="home" class="active"></section>
 
-<!-- HISTÓRICO ENTRADAS/SAÍDAS -->
+<!-- HISTÓRICO COM SELETOR -->
 <section id="historico">
-  <h2>📜 Histórico de Entradas e Saídas</h2>
-
+  <h2>📜 Histórico</h2>
   <div class="toolbar">
-    <span class="pill">Entradas</span>
-    <input id="filterEntradas" placeholder="Filtrar (título/nota fiscal)..." style="max-width:320px">
-    <button onclick="carregarEntradas()">Recarregar</button>
-    <span id="infoEntradas" class="muted right">—</span>
+    <label for="tipoHistorico"><b>Selecionar:</b></label>
+    <select id="tipoHistorico" onchange="mudarHistorico()">
+      <option value="entrada">Entradas</option>
+      <option value="saida">Saídas</option>
+    </select>
+    <button onclick="recarregarHistorico()">🔄 Recarregar</button>
+    <input id="filtroHistorico" placeholder="Filtrar..." style="flex:1;max-width:300px">
+    <span class="muted right" id="infoHistorico">—</span>
   </div>
-  <table id="tableEntradas">
-    <thead>
-      <tr>
-        <th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th><th>Atualização</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 
-  <div class="toolbar" style="margin-top:18px">
-    <span class="pill">Saídas</span>
-    <input id="filterSaidas" placeholder="Filtrar (título/destinatário/placa)..." style="max-width:360px">
-    <button onclick="carregarSaidas()">Recarregar</button>
-    <span id="infoSaidas" class="muted right">—</span>
-  </div>
-  <table id="tableSaidas">
-    <thead>
-      <tr>
-        <th>Título</th><th>Descrição Produto</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th><th>Atualização</th>
-      </tr>
-    </thead>
+  <table id="tabelaHistorico">
+    <thead></thead>
     <tbody></tbody>
   </table>
 </section>
 
-<!-- SALDO (com filtros tipo planilha e resumo por item) -->
+<!-- SALDO -->
 <section id="saldo">
   <h2>📊 Saldo de Produtos</h2>
   <div class="toolbar">
     <button onclick="carregarProdutos()">🔄 Recarregar</button>
-    <button onclick="exportarCSV()">⬇️ Exportar CSV</button>
-    <span class="right muted" id="saldoInfo">—</span>
+    <button class="btn-exportar" onclick="exportarCSV()">⬇️ Exportar Planilha</button>
+    <span id="saldoInfo" class="muted right">—</span>
   </div>
   <table id="tableSaldo">
     <thead>
@@ -104,7 +78,6 @@
         <th>Saldo Atual</th>
         <th>Data Atualização</th>
       </tr>
-      <!-- Linha de filtros por coluna (estilo planilha) -->
       <tr class="filters-row">
         <th><input data-col="Title" placeholder="Filtrar título"></th>
         <th><input data-col="CodigoFornecedor" placeholder="Filtrar cód. fornecedor"></th>
@@ -117,300 +90,107 @@
     </thead>
     <tbody></tbody>
   </table>
-
-  <h3 style="margin-top:18px">📈 Resumo por Item (soma do SaldoAtual por Título)</h3>
-  <div id="resumoWrap" class="cards"></div>
 </section>
 
 <script>
-/* ========= CONFIG ========= */
-// Links dos Forms oficiais (abrem em nova aba)
-const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
+/* CONFIGURAÇÃO */
+const FORM_CAD = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
-const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
+const FORM_SAIDA = "https://forms.microsoft.com/r/n2Rr51aG6s";
 
-// (Opcional) URLs públicas dos CSVs REAIS (cole aqui quando tiver):
-// Observação: o cabeçalho do CSV deve corresponder aos campos esperados.
-const CSV_URL_ENTRADAS = ""; // ex: "https://.../Entradas.csv"
-const CSV_URL_SAIDAS   = ""; // ex: "https://.../Saidas.csv"
-const CSV_URL_PRODUTOS = ""; // ex: "https://.../Produtos.csv"
-
-// Se as URLs acima estiverem vazias, usamos MOCK (somente para teste visual).
+const CSV_URL_ENTRADAS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B9E196987-794A-4F5D-9E9A-30A4B2399843%7D&file=Entradas.xlsx&action=default&mobileredirect=true"; 
+const CSV_URL_SAIDAS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B45A6FF48-01FE-43D0-9D9C-2089BBD49A74%7D&file=Sa%C3%ADdas.xlsx&action=default&mobileredirect=true";   
+const CSV_URL_PRODUTOS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7BE60CFD50-65D1-4A1F-90D7-D244669002D9%7D&file=Produtos.xlsx&action=default&mobileredirect=true"; 
 const USE_MOCK = !CSV_URL_ENTRADAS || !CSV_URL_SAIDAS || !CSV_URL_PRODUTOS;
 
-/* ========= LAYOUT CLÁSSICO ========= */
+/* LAYOUT */
 function mostrar(id){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  if(id==='historico'){carregarEntradas();carregarSaidas();}
-  if(id==='saldo'){carregarProdutos();}
+  if(id==='historico') mudarHistorico();
+  if(id==='saldo') carregarProdutos();
 }
 function abrirForm(tipo){
   if(tipo==='cadastro') window.open(FORM_CAD,'_blank','noopener');
-  if(tipo==='entrada')  window.open(FORM_ENTRADA,'_blank','noopener');
-  if(tipo==='saida')    window.open(FORM_SAIDA,'_blank','noopener');
+  if(tipo==='entrada') window.open(FORM_ENTRADA,'_blank','noopener');
+  if(tipo==='saida') window.open(FORM_SAIDA,'_blank','noopener');
 }
 
-/* ========= CSV PARSER (simples) ========= */
-async function fetchCSV(url){
-  const r = await fetch(url, { cache: 'no-store' });
-  if(!r.ok) throw new Error(`Falha ao baixar CSV: ${r.status}`);
-  return await r.text();
-}
-function parseCSV(text){
-  // Parser simples: divide por quebras de linha; separador vírgula; trata aspas duplas básicas
-  const lines = text.replace(/\r/g,'').split('\n').filter(l=>l.trim().length>0);
-  if(lines.length===0) return [];
-  const header = splitCSVLine(lines[0]).map(h => h.trim());
-  return lines.slice(1).map(line=>{
-    const cols = splitCSVLine(line);
-    const obj = {};
-    header.forEach((h,i)=>{ obj[h] = (cols[i]??'').trim(); });
-    return obj;
-  });
-}
-function splitCSVLine(line){
-  const out=[], re=/\s*(?:"([^"]*(?:""[^"]*)*)"|([^,]*))\s*(?:,|$)/g; // suporta "campo, com, vírgulas"
-  let m;
-  while((m=re.exec(line))!==null){
-    out.push(m[1] ? m[1].replace(/""/g,'"') : (m[2]||''));
+/* CSV UTILS */
+async function fetchCSV(url){ const r=await fetch(url,{cache:'no-store'}); return await r.text();}
+function parseCSV(text){ const l=text.trim().split('\n'); const h=l[0].split(','); return l.slice(1).map(row=>{const c=row.split(',');const o={};h.forEach((x,i)=>o[x]=c[i]);return o;});}
+function num(x){return Number(x)||0;}
+const fmtBR = n => Number(n).toLocaleString('pt-BR',{maximumFractionDigits:2});
+
+/* MOCK */
+const MOCK_ENTRADAS=[{Title:"Parafuso",Quantidade:"10",ValorUnitario:"2",ValorTotal:"20",NotaFiscal:"NF01",Modified:"2025-10-10"}];
+const MOCK_SAIDAS=[{Title:"Arruela",DescricaoProduto:"Arruela Aço",Quantidade:"5",PlacaCaminhao:"ABC1234",Destinatario:"Cliente Z",Modified:"2025-10-11"}];
+const MOCK_PRODUTOS=[{Title:"Parafuso",CodigoFornecedor:"CF01",DescricaoProduto:"Parafuso M8",NomeFornecedor:"ACME",UnidadeMedida:"un",SaldoAtual:"200",DataAtualizacao:"2025-10-11"}];
+
+/* HISTÓRICO */
+let HIST_CACHE=[];
+async function mudarHistorico(){ 
+  const tipo=document.getElementById('tipoHistorico').value;
+  const th=document.querySelector('#tabelaHistorico thead'); const tb=document.querySelector('#tabelaHistorico tbody');
+  th.innerHTML=""; tb.innerHTML="";
+  if(tipo==='entrada'){
+    th.innerHTML="<tr><th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th><th>Atualização</th></tr>";
+    carregarHistorico('entrada');
+  } else {
+    th.innerHTML="<tr><th>Título</th><th>Descrição Produto</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th><th>Atualização</th></tr>";
+    carregarHistorico('saida');
   }
-  return out;
 }
-
-/* ========= HELPERS ========= */
-const fmtBR = (n,dec=2)=>Number(n).toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec});
-function toDateStr(d){try{if(!d) return ""; const x=new Date(d); if(isNaN(x)) return ""; return x.toLocaleString('pt-BR')}catch{return ""}}
-function num(x){ if(x===null||x===undefined||x==="") return 0; const s=String(x).replace(/\./g,'').replace(',','.'); const n=Number(s); return isNaN(n)?0:n; }
-function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(null,a),ms)}}
-
-/* ========= MOCK DATA (somente para teste visual) ========= */
-const MOCK_ENTRADAS = [
-  { Title:"Parafuso M8", Quantidade:"100", ValorUnitario:"2.50", ValorTotal:"",  NotaFiscal:"NF123", Modified:"2025-10-20T10:22:00Z" },
-  { Title:"Arruela Aço", Quantidade:"200", ValorUnitario:"0.35", ValorTotal:"70", NotaFiscal:"NF124", Modified:"2025-10-21T11:40:00Z" }
-];
-const MOCK_SAIDAS = [
-  { Title:"Parafuso M8", DescricaoProduto:"Parafuso sextavado", Quantidade:"20", PlacaCaminhao:"ABC1D23", Destinatario:"Cliente X", Modified:"2025-10-22T09:05:00Z" },
-  { Title:"Arruela Aço", DescricaoProduto:"Arruela zincada",   Quantidade:"50", PlacaCaminhao:"DEF4G56", Destinatario:"Cliente Y", Modified:"2025-10-23T14:12:00Z" }
-];
-const MOCK_PRODUTOS = [
-  { Title:"Parafuso M8", CodigoFornecedor:"CF-12345", DescricaoProduto:"Parafuso sextavado zincado", NomeFornecedor:"ACME Peças", UnidadeMedida:"un", SaldoAtual:"480", DataAtualizacao:"2025-10-23T14:12:00Z" },
-  { Title:"Arruela Aço", CodigoFornecedor:"CF-67890", DescricaoProduto:"Arruela zincada 8mm",       NomeFornecedor:"ACME Peças", UnidadeMedida:"un", SaldoAtual:"650", DataAtualizacao:"2025-10-23T14:12:00Z" }
-];
-
-/* ========= ADAPTADORES DE DADOS (CSV -> campos esperados) ========= */
-// Mapeia campos por nome, tolerando variações de maiúsculas/minúsculas e espaços
-function mapFields(row){
-  const out={}; for(const k in row){ out[k.trim().toLowerCase()] = row[k]; } return out;
-}
-
-/* ========= ENTRADAS ========= */
-let ENTRADAS_CACHE=[];
-async function carregarEntradas(){
+async function carregarHistorico(tipo){
+  const url = tipo==='entrada'?CSV_URL_ENTRADAS:CSV_URL_SAIDAS;
   try{
-    if(USE_MOCK){
-      ENTRADAS_CACHE = MOCK_ENTRADAS.slice();
-    }else{
-      const csv = await fetchCSV(CSV_URL_ENTRADAS);
-      const rows = parseCSV(csv);
-      ENTRADAS_CACHE = rows.map(r=>{
-        const m = mapFields(r);
-        return {
-          Title: m['title']||m['título']||m['titulo']||'',
-          Quantidade: m['quantidade']||'',
-          ValorUnitario: m['valorunitario']||m['valor_unitario']||m['valor unitario']||'',
-          ValorTotal: m['valortotal']||m['valor_total']||m['valor total']||'',
-          NotaFiscal: m['notafiscal']||m['nota_fiscal']||m['nota fiscal']||'',
-          Modified: m['modified']||m['data']||m['atualizacao']||m['atualização']||''
-        };
-      });
-    }
-    renderEntradas();
-  }catch(e){
-    document.getElementById('infoEntradas').textContent = 'Erro ao carregar: '+e.message;
-  }
+    if(USE_MOCK){HIST_CACHE = tipo==='entrada'?MOCK_ENTRADAS:MOCK_SAIDAS;}
+    else {const csv=await fetchCSV(url); HIST_CACHE=parseCSV(csv);}
+    renderHistorico(tipo);
+  }catch(e){document.getElementById('infoHistorico').textContent='Erro: '+e.message;}
 }
-function renderEntradas(){
-  const term=(document.getElementById('filterEntradas').value||'').toLowerCase().trim();
-  const tb=document.querySelector("#tableEntradas tbody"); tb.innerHTML="";
-  let count=0, somaVT=0;
-  ENTRADAS_CACHE
-    .filter(x => !term || (x.Title||'').toLowerCase().includes(term) || (x.NotaFiscal||'').toLowerCase().includes(term))
-    .forEach(i=>{
-      const q = num(i.Quantidade);
-      const vu = num(i.ValorUnitario);
-      const vt = i.ValorTotal!==null && i.ValorTotal!==undefined && i.ValorTotal!=="" ? num(i.ValorTotal) : (q*vu);
-      const tr=document.createElement('tr');
-      tr.innerHTML = `
-        <td>${i.Title||''}</td>
-        <td>${q}</td>
-        <td>R$ ${fmtBR(vu)}</td>
-        <td>R$ ${fmtBR(vt)}</td>
-        <td>${i.NotaFiscal||''}</td>
-        <td>${toDateStr(i.Modified)}</td>`;
-      tb.appendChild(tr);
-      count++; somaVT += vt;
-    });
-  document.getElementById('infoEntradas').textContent = `Registros: ${count} | Soma ValorTotal: R$ ${fmtBR(somaVT)}`;
-}
-document.getElementById('filterEntradas').addEventListener('input', debounce(renderEntradas, 200));
-
-/* ========= SAÍDAS ========= */
-let SAIDAS_CACHE=[];
-async function carregarSaidas(){
-  try{
-    if(USE_MOCK){
-      SAIDAS_CACHE = MOCK_SAIDAS.slice();
-    }else{
-      const csv = await fetchCSV(CSV_URL_SAIDAS);
-      const rows = parseCSV(csv);
-      SAIDAS_CACHE = rows.map(r=>{
-        const m = mapFields(r);
-        return {
-          Title: m['title']||m['título']||m['titulo']||'',
-          DescricaoProduto: m['descricaoproduto']||m['descricao_produto']||m['descrição do produto']||m['descriçãoproduto']||'',
-          Quantidade: m['quantidade']||'',
-          PlacaCaminhao: m['placacaminhao']||m['placa_caminhao']||m['placa do caminhao']||m['placa caminhão']||'',
-          Destinatario: m['destinatario']||m['destinatário']||'',
-          Modified: m['modified']||m['data']||m['atualizacao']||m['atualização']||''
-        };
-      });
-    }
-    renderSaidas();
-  }catch(e){
-    document.getElementById('infoSaidas').textContent = 'Erro ao carregar: '+e.message;
-  }
-}
-function renderSaidas(){
-  const term=(document.getElementById('filterSaidas').value||'').toLowerCase().trim();
-  const tb=document.querySelector("#tableSaidas tbody"); tb.innerHTML="";
+function renderHistorico(tipo){
+  const tb=document.querySelector('#tabelaHistorico tbody'); tb.innerHTML="";
+  const f=document.getElementById('filtroHistorico').value.toLowerCase();
   let count=0;
-  SAIDAS_CACHE
-    .filter(x => !term || (x.Title||'').toLowerCase().includes(term) || (x.Destinatario||'').toLowerCase().includes(term) || (x.PlacaCaminhao||'').toLowerCase().includes(term))
-    .forEach(i=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML = `
-        <td>${i.Title||''}</td>
-        <td>${i.DescricaoProduto||''}</td>
-        <td>${i.Quantidade||0}</td>
-        <td>${i.PlacaCaminhao||''}</td>
-        <td>${i.Destinatario||''}</td>
-        <td>${toDateStr(i.Modified)}</td>`;
-      tb.appendChild(tr);
-      count++;
-    });
-  document.getElementById('infoSaidas').textContent = `Registros: ${count}`;
+  HIST_CACHE.filter(r=>!f || Object.values(r).some(v=>String(v).toLowerCase().includes(f)))
+  .forEach(i=>{
+    const tr=document.createElement('tr');
+    if(tipo==='entrada') tr.innerHTML=`<td>${i.Title}</td><td>${i.Quantidade}</td><td>${i.ValorUnitario}</td><td>${i.ValorTotal}</td><td>${i.NotaFiscal}</td><td>${i.Modified}</td>`;
+    else tr.innerHTML=`<td>${i.Title}</td><td>${i.DescricaoProduto}</td><td>${i.Quantidade}</td><td>${i.PlacaCaminhao}</td><td>${i.Destinatario}</td><td>${i.Modified}</td>`;
+    tb.appendChild(tr); count++;
+  });
+  document.getElementById('infoHistorico').textContent=`Registros: ${count}`;
 }
-document.getElementById('filterSaidas').addEventListener('input', debounce(renderSaidas, 200));
+function recarregarHistorico(){mudarHistorico();}
+document.getElementById('filtroHistorico').addEventListener('input',()=>mudarHistorico());
 
-/* ========= SALDO ========= */
-let PRODUTOS_CACHE=[], PRODUTOS_FILTRADO=[];
+/* SALDO */
+let PROD_CACHE=[];
 async function carregarProdutos(){
   try{
-    if(USE_MOCK){
-      PRODUTOS_CACHE = MOCK_PRODUTOS.slice();
-    }else{
-      const csv = await fetchCSV(CSV_URL_PRODUTOS);
-      const rows = parseCSV(csv);
-      PRODUTOS_CACHE = rows.map(r=>{
-        const m = mapFields(r);
-        return {
-          Title: m['title']||m['título']||m['titulo']||'',
-          CodigoFornecedor: m['codigofornecedor']||m['codigo_fornecedor']||m['código do fornecedor']||'',
-          DescricaoProduto: m['descricaoproduto']||m['descricao_produto']||'',
-          NomeFornecedor: m['nomefornecedor']||m['nome_fornecedor']||'',
-          UnidadeMedida: m['unidademedida']||m['unidade_medida']||'',
-          SaldoAtual: m['saldoatual']||m['saldo_atual']||'',
-          DataAtualizacao: m['dataatualizacao']||m['data_atualizacao']||m['atualizacao']||m['modified']||''
-        };
-      });
-    }
-    aplicarFiltrosSaldo();
-  }catch(e){
-    document.getElementById('saldoInfo').textContent = 'Erro ao carregar: '+e.message;
-  }
-}
-function aplicarFiltrosSaldo(){
-  const f = {};
-  document.querySelectorAll('.filters-row input').forEach(inp=>f[inp.dataset.col]=inp.value.trim());
-
-  PRODUTOS_FILTRADO = PRODUTOS_CACHE.filter(it=>{
-    const like = (v,term)=> !term || (String(v||'').toLowerCase().includes(term.toLowerCase()));
-    if(!like(it.Title, f.Title)) return false;
-    if(!like(it.CodigoFornecedor, f.CodigoFornecedor)) return false;
-    if(!like(it.DescricaoProduto, f.DescricaoProduto)) return false;
-    if(!like(it.NomeFornecedor, f.NomeFornecedor)) return false;
-    if(!like(it.UnidadeMedida, f.UnidadeMedida)) return false;
-
-    if(f.SaldoAtual){
-      const m = f.SaldoAtual.match(/^\s*([<>]=?|=)?\s*(-?\d+(?:[.,]\d+)?)\s*$/);
-      const val = num(it.SaldoAtual);
-      if(m){
-        const op = m[1]||'=';
-        const tgt = num(m[2]);
-        if(op==='=' && !(val===tgt)) return false;
-        if(op==='>' && !(val>tgt)) return false;
-        if(op==='<' && !(val<tgt)) return false;
-        if(op==='>=' && !(val>=tgt)) return false;
-        if(op==='<=' && !(val<=tgt)) return false;
-      }
-    }
-    if(f.DataAtualizacao){
-      const d = new Date(it.DataAtualizacao);
-      const ymd = isNaN(d) ? '' : d.toISOString().slice(0,10);
-      if(!ymd.startsWith(f.DataAtualizacao)) return false;
-    }
-    return true;
-  });
-
-  renderSaldo(PRODUTOS_FILTRADO);
-  renderResumo(PRODUTOS_FILTRADO);
+    if(USE_MOCK){PROD_CACHE=MOCK_PRODUTOS;}
+    else{const csv=await fetchCSV(CSV_URL_PRODUTOS);PROD_CACHE=parseCSV(csv);}
+    renderSaldo(PROD_CACHE);
+  }catch(e){document.getElementById('saldoInfo').textContent='Erro: '+e.message;}
 }
 function renderSaldo(rows){
-  const tb=document.querySelector("#tableSaldo tbody"); tb.innerHTML="";
+  const tb=document.querySelector('#tableSaldo tbody'); tb.innerHTML="";
   rows.forEach(i=>{
     const tr=document.createElement('tr');
-    tr.innerHTML = `
-      <td>${i.Title||''}</td>
-      <td>${i.CodigoFornecedor||''}</td>
-      <td>${i.DescricaoProduto||''}</td>
-      <td>${i.NomeFornecedor||''}</td>
-      <td>${i.UnidadeMedida||''}</td>
-      <td>${num(i.SaldoAtual)}</td>
-      <td>${toDateStr(i.DataAtualizacao)}</td>`;
+    tr.innerHTML=`<td>${i.Title}</td><td>${i.CodigoFornecedor}</td><td>${i.DescricaoProduto}</td><td>${i.NomeFornecedor}</td><td>${i.UnidadeMedida}</td><td>${fmtBR(i.SaldoAtual)}</td><td>${i.DataAtualizacao}</td>`;
     tb.appendChild(tr);
   });
-  document.getElementById('saldoInfo').textContent =
-    `Itens: ${rows.length} | Saldo total: ${fmtBR(rows.reduce((s,x)=>s+num(x.SaldoAtual),0),0)}`;
+  document.getElementById('saldoInfo').textContent=`Itens: ${rows.length}`;
 }
-function renderResumo(rows){
-  const map=new Map();
-  rows.forEach(i=>{
-    const key=i.Title||'(sem título)';
-    map.set(key,(map.get(key)||0)+num(i.SaldoAtual));
-  });
-  const wrap=document.getElementById('resumoWrap'); wrap.innerHTML="";
-  [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).forEach(([t,total])=>{
-    const div=document.createElement('div'); div.className='card';
-    div.innerHTML=`<div><b>${t}</b></div><div class="muted">Saldo: <b>${fmtBR(total,0)}</b></div>`;
-    wrap.appendChild(div);
-  });
-}
-document.querySelectorAll('.filters-row input').forEach(inp=>{
-  inp.addEventListener('input', debounce(aplicarFiltrosSaldo, 180));
-});
 function exportarCSV(){
   const table=document.getElementById('tableSaldo');
   const rows=[...table.rows].map(tr=>[...tr.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
   const blob=new Blob([rows.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`saldo_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
 
-/* ========= INIT ========= */
-(function init(){
-  mostrar('home'); // começa na tela informativa
-})();
+(function init(){mostrar('home');})();
 </script>
 
 </body>
