@@ -115,7 +115,7 @@
 <script>
 const SHAREPOINT_SITE_ROOT = 'https://borexpress.sharepoint.com/sites/EstoqueJC';
 const LIST_PRODUTOS = 'Produtos';
-const FORM_URL_ENTRADA = 'https://forms.microsoft.com/r/8EaCX7pKR';
+const FORM_URL_ENTRADA = 'https://forms.microsoft.com/r/8EaCX7pKRQ';
 const FORM_URL_SAIDA   = 'https://forms.microsoft.com/r/n2Rr51aG6s';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -128,20 +128,18 @@ async function spDigest() {
   const j = await r.json();
   return j.FormDigestValue;
 }
-async function spPostItem(list, obj) {
-  const digest = await spDigest();
-  const r = await fetch(`${SHAREPOINT_SITE_ROOT}/_api/web/lists/GetByTitle('${list}')/items`, {
+async function spPostItem(listTitle, item) {
+  const resp = await fetch("/api/saveProduto", {
     method: "POST",
-    headers: {
-      "Accept": "application/json;odata=nometadata",
-      "Content-Type": "application/json;odata=nometadata",
-      "X-RequestDigest": digest
-    },
-    body: JSON.stringify(obj)
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(item),
   });
-  if (!r.ok) throw new Error(await r.text());
-  return await r.json();
+
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(JSON.stringify(data.error || data));
+  return data;
 }
+
 async function spGet(list, select) {
   const r = await fetch(`${SHAREPOINT_SITE_ROOT}/_api/web/lists/GetByTitle('${list}')/items?$select=${select}&$top=5000`, {
     headers: {"Accept": "application/json;odata=nometadata"}
@@ -217,4 +215,5 @@ loadProdutos();
 </script>
 </body>
 </html>
+
 
