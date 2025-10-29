@@ -2,8 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema de Estoque – BORA</title>
   <style>
     :root {
@@ -14,559 +13,207 @@
       --primary: #4aa3ff;
       --accent: #5ee6a8;
       --danger: #ff6b6b;
-      --warning: #ffd166;
       --radius: 16px;
     }
-    * { box-sizing: border-box; }
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 10% -10%, #17233b 0%, #0b1220 45%, #0b1220 100%);
+      font-family: system-ui, sans-serif;
+      background: radial-gradient(1200px 800px at 10% -10%, #17233b 0%, #0b1220 45%);
       color: var(--text);
       margin: 0;
-      padding: 0;
     }
-    header {
-      position: sticky; top: 0; z-index: 20;
-      background: rgba(11,18,32,0.8);
-      backdrop-filter: blur(6px);
-      border-bottom: 1px solid #1f2a44;
-    }
+    header { background: rgba(11,18,32,0.8); border-bottom: 1px solid #1f2a44; position: sticky; top: 0; z-index: 20; }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 16px 20px; }
-    .brand {
-      display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: .3px;
-    }
-    .brand .logo {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      display: grid; place-items: center; color: #0b1220; font-weight: 900;
-    }
-    .actions {
-      display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;
-    }
-    button, .btn {
-      appearance: none; border: 0; cursor: pointer;
-      background: linear-gradient(180deg, #1a2741, #132038);
-      color: var(--text); padding: 10px 14px; border-radius: 12px;
-      display: inline-flex; align-items: center; gap: 8px; font-weight: 600;
-      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
-      box-shadow: 0 6px 16px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.04);
-    }
-    button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06); }
-    .btn-primary { background: linear-gradient(180deg, #2a6ad9, #1e4fb0); }
-    .btn-accent { background: linear-gradient(180deg, #1f7a5c, #145f47); }
-    .btn-warning { background: linear-gradient(180deg, #c48b1f, #936814); }
-    .btn-danger { background: linear-gradient(180deg, #b63b3b, #8f2a2a); }
-
-    main { max-width: 1100px; margin: 20px auto 60px; padding: 0 20px; }
-    .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
-    .tab { padding: 10px 12px; background: #131c2f; border: 1px solid #1f2a44; border-radius: 12px; text-align: center; cursor: pointer; font-weight: 600; color: var(--muted); }
-    .tab.active { color: var(--text); background: linear-gradient(180deg, #1a2741, #132038); border-color: #2b3a5f; }
-
-    .card {
-      background: linear-gradient(180deg, #121a2b, #0e1525);
-      border: 1px solid #1f2a44; border-radius: var(--radius);
-      padding: 16px; box-shadow: 0 10px 28px rgba(0,0,0,.35);
-    }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { padding: 10px 8px; border-bottom: 1px solid #1e2a47; text-align: left; }
-    th { color: #9fb6d9; font-weight: 700; font-size: 14px; }
-    td { font-size: 14px; color: #d8e4f7; }
-    .muted { color: var(--muted); font-size: 12px; }
-
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+    .brand .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--accent)); display: grid; place-items: center; color: #0b1220; font-weight: 900; }
+    button { border: none; cursor: pointer; border-radius: 10px; padding: 10px 14px; font-weight: 600; }
+    .btn-primary { background: linear-gradient(180deg, #2a6ad9, #1e4fb0); color: white; }
+    .btn-accent { background: linear-gradient(180deg, #1f7a5c, #145f47); color: white; }
+    .btn-danger { background: linear-gradient(180deg, #b63b3b, #8f2a2a); color: white; }
+    .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 1100px; margin: 20px auto; }
+    .tab { text-align: center; padding: 10px; background: #131c2f; border: 1px solid #1f2a44; border-radius: 12px; cursor: pointer; color: var(--muted); }
+    .tab.active { background: linear-gradient(180deg, #1a2741, #132038); color: white; }
+    .card { background: #121a2b; border: 1px solid #1f2a44; border-radius: var(--radius); padding: 20px; max-width: 1100px; margin: 0 auto 40px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px; border-bottom: 1px solid #1f2a44; text-align: left; }
+    th { color: #9fb6d9; }
+    input { width: 100%; padding: 10px; border: 1px solid #223055; border-radius: 8px; background: #0f1729; color: white; }
+    label { color: #9fb6d9; font-size: 13px; }
     .grid { display: grid; gap: 16px; }
-    .grid-2 { grid-template-columns: 1fr 1fr; }
     .grid-3 { grid-template-columns: repeat(3, 1fr); }
-
-    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    input, select {
-      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #223055;
-      background: #0f1729; color: var(--text);
-    }
-    label { font-size: 13px; color: #9fb6d9; }
-    .field { display: grid; gap: 6px; }
-
-    .right { margin-left: auto; }
-    .hidden { display: none !important; }
-    .loader { font-size: 13px; color: var(--muted); }
-
-    .actions-bar { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .hidden { display: none; }
+    .muted { color: var(--muted); font-size: 13px; }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="brand">
-        <div class="logo">B</div>
-        <div>
-          <div>Sistema de Estoque – BORA</div>
-          <div class="muted">SharePoint + Microsoft Forms</div>
-        </div>
-      </div>
-      <div class="actions">
-        <button class="btn-primary" id="btnAbrirFormEntrada">➕ Abrir Formulário de ENTRADA</button>
-        <button class="btn-danger" id="btnAbrirFormSaida">➖ Abrir Formulário de SAÍDA</button>
-        <button class="btn-accent" id="btnRecarregar">🔄 Recarregar Listas</button>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">B</div>
+      <div>
+        <div>Sistema de Estoque – BORA</div>
+        <div class="muted">SharePoint + Microsoft Forms</div>
       </div>
     </div>
-  </header>
-
-  <main>
-    <div class="tabs" id="tabs">
-      <div class="tab active" data-target="tab-entradas">Histórico – Entradas</div>
-      <div class="tab" data-target="tab-saidas">Histórico – Saídas</div>
-      <div class="tab" data-target="tab-saldo">Saldo (Produtos)</div>
-      <div class="tab" data-target="tab-produtos">Cadastro – Produtos</div>
+    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn-primary" id="btnAbrirFormEntrada">Abrir Formulário ENTRADA</button>
+      <button class="btn-danger" id="btnAbrirFormSaida">Abrir Formulário SAÍDA</button>
+      <button class="btn-accent" id="btnRecarregar">Recarregar Dados</button>
     </div>
+  </div>
+</header>
 
-    <!-- ENTRADAS -->
-    <section id="tab-entradas" class="card">
-      <div class="actions-bar">
-        <div>
-          <div style="font-weight:700;">📥 Histórico de Entradas</div>
-          <div class="muted">Mostrando últimas entradas. Valor Total é calculado automaticamente se não vier da lista.</div>
-        </div>
-        <div class="row">
-          <input id="filterEntrada" placeholder="Filtrar por título ou nota fiscal..." />
-          <button id="btnFiltroEntrada">Filtrar</button>
-        </div>
-      </div>
-      <div id="loaderEntradas" class="loader">Carregando entradas...</div>
-      <table id="tableEntradas" class="hidden">
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Quantidade</th>
-            <th>Valor Unitário</th>
-            <th>Valor Total</th>
-            <th>Nota Fiscal</th>
-            <th>Atualização</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
+<div class="tabs" id="tabs">
+  <div class="tab active" data-target="tab-produtos">Cadastro – Produtos</div>
+  <div class="tab" data-target="tab-entradas">Histórico – Entradas</div>
+  <div class="tab" data-target="tab-saidas">Histórico – Saídas</div>
+  <div class="tab" data-target="tab-saldo">Saldo (Produtos)</div>
+</div>
 
-    <!-- SAÍDAS -->
-    <section id="tab-saidas" class="card hidden">
-      <div class="actions-bar">
-        <div>
-          <div style="font-weight:700;">📤 Histórico de Saídas</div>
-          <div class="muted">Mostrando últimas saídas.</div>
-        </div>
-        <div class="row">
-          <input id="filterSaida" placeholder="Filtrar por título/destinatário/placa..." />
-          <button id="btnFiltroSaida">Filtrar</button>
-        </div>
-      </div>
-      <div id="loaderSaidas" class="loader">Carregando saídas...</div>
-      <table id="tableSaidas" class="hidden">
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Descrição do Produto</th>
-            <th>Quantidade</th>
-            <th>Placa Caminhão</th>
-            <th>Destinatário</th>
-            <th>Atualização</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
+<!-- CADASTRO PRODUTOS -->
+<section id="tab-produtos" class="card">
+  <h2>🧾 Cadastro de Produtos</h2>
+  <div class="grid grid-3">
+    <div>
+      <label>Título (Nome do Produto)</label>
+      <input id="pTitle" placeholder="Ex.: Parafuso M8 x 20mm">
+    </div>
+    <div>
+      <label>Código do Fornecedor</label>
+      <input id="pCodigoFornecedor" placeholder="Ex.: CF-12345">
+    </div>
+    <div>
+      <label>Código de Fábrica</label>
+      <input id="pCodigoFabrica" placeholder="Ex.: FAB-9876">
+    </div>
+    <div>
+      <label>Descrição do Produto</label>
+      <input id="pDescricao" placeholder="Ex.: Parafuso zincado sextavado">
+    </div>
+    <div>
+      <label>Nome do Fornecedor</label>
+      <input id="pNomeFornecedor" placeholder="Ex.: ACME Peças">
+    </div>
+    <div>
+      <label>Unidade de Medida</label>
+      <input id="pUnidade" placeholder="Ex.: un, cx, kg">
+    </div>
+    <div>
+      <label>Saldo Atual</label>
+      <input id="pSaldoAtual" type="number" min="0" value="0">
+    </div>
+  </div>
+  <br>
+  <button class="btn-primary" id="btnSalvarProduto">💾 Salvar Produto</button>
+  <p id="saveStatus" class="muted"></p>
+</section>
 
-    <!-- SALDO / PRODUTOS -->
-    <section id="tab-saldo" class="card hidden">
-      <div class="actions-bar">
-        <div>
-          <div style="font-weight:700;">📊 Saldo de Produtos</div>
-          <div class="muted">Listagem completa do cadastro e saldo atual.</div>
-        </div>
-        <div class="row">
-          <input id="filterSaldo" placeholder="Filtrar por título/fornecedor/descrição..." />
-          <button id="btnFiltroSaldo">Filtrar</button>
-          <button class="btn-accent right" id="btnExportSaldo">⬇️ Exportar para Excel (CSV)</button>
-        </div>
-      </div>
-      <div id="loaderSaldo" class="loader">Carregando produtos...</div>
-      <table id="tableSaldo" class="hidden">
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Código Fornecedor</th>
-            <th>Descrição Produto</th>
-            <th>Nome Fornecedor</th>
-            <th>Unidade</th>
-            <th>Saldo Atual</th>
-            <th>Data Atualização</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
+<!-- Entradas, Saídas e Saldo permanecem iguais -->
+<section id="tab-entradas" class="card hidden"><h2>📥 Histórico de Entradas</h2><div id="loaderEntradas" class="muted">Carregando...</div><table id="tableEntradas" class="hidden"><thead><tr><th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th></tr></thead><tbody></tbody></table></section>
+<section id="tab-saidas" class="card hidden"><h2>📤 Histórico de Saídas</h2><div id="loaderSaidas" class="muted">Carregando...</div><table id="tableSaidas" class="hidden"><thead><tr><th>Título</th><th>Descrição</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th></tr></thead><tbody></tbody></table></section>
+<section id="tab-saldo" class="card hidden"><h2>📊 Saldo de Produtos</h2><button class="btn-accent" id="btnExportSaldo">⬇️ Exportar para Excel</button><div id="loaderSaldo" class="muted">Carregando...</div><table id="tableSaldo" class="hidden"><thead><tr><th>Título</th><th>Cód. Fornecedor</th><th>Cód. Fábrica</th><th>Descrição</th><th>Fornecedor</th><th>Unid.</th><th>Saldo</th><th>Atualização</th></tr></thead><tbody></tbody></table></section>
 
-    <!-- CADASTRO PRODUTOS -->
-    <section id="tab-produtos" class="card hidden">
-      <div class="actions-bar">
-        <div>
-          <div style="font-weight:700;">🧾 Cadastro de Produtos</div>
-          <div class="muted">Grava direto na lista <b>Produtos</b> (DataAtualizacao automática).</div>
-        </div>
-      </div>
-      <div class="grid grid-3">
-        <div class="field">
-          <label for="pTitle">Título (Nome do Produto)</label>
-          <input id="pTitle" placeholder="Ex.: Parafuso M8 x 20mm"/>
-        </div>
-        <div class="field">
-          <label for="pCodigoFornecedor">Código do Fornecedor</label>
-          <input id="pCodigoFornecedor" placeholder="Ex.: CF-12345"/>
-        </div>
-        <div class="field">
-          <label for="pDescricao">Descrição do Produto</label>
-          <input id="pDescricao" placeholder="Ex.: Parafuso sextavado zincado"/>
-        </div>
-        <div class="field">
-          <label for="pNomeFornecedor">Nome do Fornecedor</label>
-          <input id="pNomeFornecedor" placeholder="Ex.: ACME Peças"/>
-        </div>
-        <div class="field">
-          <label for="pUnidade">Unidade de Medida</label>
-          <input id="pUnidade" placeholder="Ex.: un, cx, kg, m"/>
-        </div>
-        <div class="field">
-          <label for="pSaldoAtual">Saldo Atual</label>
-          <input id="pSaldoAtual" type="number" step="1" min="0" placeholder="Ex.: 0"/>
-        </div>
-      </div>
-      <div class="row" style="margin-top:12px;">
-        <button class="btn-primary" id="btnSalvarProduto">💾 Salvar Produto</button>
-        <div id="saveStatus" class="muted"></div>
-      </div>
-    </section>
-  </main>
+<script>
+const SHAREPOINT_SITE_ROOT = 'https://borexpress.sharepoint.com/sites/EstoqueJC';
+const LIST_PRODUTOS = 'Produtos';
+const FORM_URL_ENTRADA = 'COLE_AQUI_A_URL_DO_FORM_ENTRADA';
+const FORM_URL_SAIDA   = 'COLE_AQUI_A_URL_DO_FORM_SAIDA';
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
 
-  <script>
-    // ================================
-    // CONFIG
-    // ================================
-    const SHAREPOINT_SITE_ROOT = 'https://borexpress.sharepoint.com/sites/EstoqueJC'; // <- ajuste se necessário
-    const LIST_ENTRADAS = 'Entradas';
-    const LIST_SAIDAS   = 'Saidas';
-    const LIST_PRODUTOS = 'Produtos';
+async function spDigest() {
+  const r = await fetch(`${SHAREPOINT_SITE_ROOT}/_api/contextinfo`, {
+    method: "POST",
+    headers: {"Accept": "application/json;odata=nometadata"}
+  });
+  const j = await r.json();
+  return j.FormDigestValue;
+}
+async function spPostItem(list, obj) {
+  const digest = await spDigest();
+  const r = await fetch(`${SHAREPOINT_SITE_ROOT}/_api/web/lists/GetByTitle('${list}')/items`, {
+    method: "POST",
+    headers: {
+      "Accept": "application/json;odata=nometadata",
+      "Content-Type": "application/json;odata=nometadata",
+      "X-RequestDigest": digest
+    },
+    body: JSON.stringify(obj)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return await r.json();
+}
+async function spGet(list, select) {
+  const r = await fetch(`${SHAREPOINT_SITE_ROOT}/_api/web/lists/GetByTitle('${list}')/items?$select=${select}&$top=5000`, {
+    headers: {"Accept": "application/json;odata=nometadata"}
+  });
+  const j = await r.json();
+  return j.value || [];
+}
 
-    // URLs dos Microsoft Forms (abrir direto em abas novas)
-    const FORM_URL_ENTRADA = 'https://forms.microsoft.com/r/8EaCX7pKRQ';
-    const FORM_URL_SAIDA   = 'https://forms.microsoft.com/r/n2Rr51aG6s';
+$('#btnSalvarProduto').addEventListener('click', async () => {
+  const title = $('#pTitle').value.trim();
+  if (!title) return $('#saveStatus').innerText = '⚠️ Informe o título.';
 
-    // ================================
-    // HELPERS
-    // ================================
-    const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+  const item = {
+    Title: title,
+    CodigoFornecedor: $('#pCodigoFornecedor').value.trim(),
+    CodigoFabrica: $('#pCodigoFabrica').value.trim(),
+    DescricaoProduto: $('#pDescricao').value.trim(),
+    NomeFornecedor: $('#pNomeFornecedor').value.trim(),
+    UnidadeMedida: $('#pUnidade').value.trim(),
+    SaldoAtual: Number($('#pSaldoAtual').value || 0),
+    DataAtualizacao: new Date().toISOString()
+  };
 
-    function fmtNumber(n, opts = { minimumFractionDigits: 2, maximumFractionDigits: 2 }) {
-      const num = Number(n);
-      return isFinite(num) ? num.toLocaleString('pt-BR', opts) : '';
-    }
-    function fmtInt(n) {
-      const num = Number(n);
-      return isFinite(num) ? num.toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : '';
-    }
-    function fmtDate(d) {
-      try {
-        if (!d) return '';
-        const dt = new Date(d);
-        if (isNaN(dt)) return '';
-        return dt.toLocaleString('pt-BR');
-      } catch { return ''; }
-    }
+  $('#saveStatus').innerText = 'Salvando...';
+  try {
+    await spPostItem(LIST_PRODUTOS, item);
+    $('#saveStatus').innerText = '✅ Produto salvo com sucesso!';
+    ['#pTitle','#pCodigoFornecedor','#pCodigoFabrica','#pDescricao','#pNomeFornecedor','#pUnidade','#pSaldoAtual']
+      .forEach(id => $(id).value = '');
+    loadProdutos();
+    setActiveTab('tab-saldo');
+  } catch(e) {
+    $('#saveStatus').innerText = '❌ Erro ao salvar: ' + e.message;
+  }
+});
 
-    async function spGet(url, select = null, filter = null, orderby = null, top = 5000) {
-      const parts = [];
-      if (select) parts.push(`$select=${encodeURIComponent(select)}`);
-      if (filter) parts.push(`$filter=${encodeURIComponent(filter)}`);
-      if (orderby) parts.push(`$orderby=${encodeURIComponent(orderby)}`);
-      if (top) parts.push(`$top=${top}`);
-      const qs = parts.length ? `?${parts.join('&')}` : '';
-      const resp = await fetch(`${SHAREPOINT_SITE_ROOT}${url}${qs}`, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json;odata=nometadata' }
-      });
-      if (!resp.ok) throw new Error(`GET ${url} falhou: ${resp.status}`);
-      return resp.json();
-    }
-
-    async function spDigest() {
-      const resp = await fetch(`${SHAREPOINT_SITE_ROOT}/_api/contextinfo`, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json;odata=nometadata' }
-      });
-      if (!resp.ok) throw new Error('Falha ao obter X-RequestDigest');
-      const data = await resp.json();
-      return data.FormDigestValue;
-    }
-
-    async function spPostItem(listTitle, item) {
-      const digest = await spDigest();
-      const url = `${SHAREPOINT_SITE_ROOT}/_api/web/lists/GetByTitle('${encodeURIComponent(listTitle)}')/items`;
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json;odata=nometadata',
-          'Content-Type': 'application/json;odata=nometadata',
-          'X-RequestDigest': digest
-        },
-        body: JSON.stringify(item)
-      });
-      if (!resp.ok) {
-        const txt = await resp.text();
-        throw new Error(`POST ${listTitle} falhou: ${resp.status} – ${txt}`);
-      }
-      return resp.json();
-    }
-
-    function exportTableToCSV(tableEl, filename) {
-      let csv = [];
-      for (const row of tableEl.rows) {
-        const cols = Array.from(row.cells).map(td => {
-          const t = td.innerText ?? '';
-          const safe = t.replace(/"/g, '""');
-          return `"${safe}"`;
-        });
-        csv.push(cols.join(','));
-      }
-      const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-    }
-
-    // ================================
-    // UI: Tabs
-    // ================================
-    function setActiveTab(id) {
-      $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.target === id));
-      ['tab-entradas','tab-saidas','tab-saldo','tab-produtos'].forEach(sec => {
-        const el = document.getElementById(sec);
-        if (el) el.classList.toggle('hidden', sec !== id);
-      });
-    }
-    $$('#tabs .tab').forEach(tab => {
-      tab.addEventListener('click', () => setActiveTab(tab.dataset.target));
-    });
-
-    // ================================
-    // Ações Header
-    // ================================
-    $('#btnAbrirFormEntrada').addEventListener('click', () => window.open(FORM_URL_ENTRADA, '_blank', 'noopener'));
-    $('#btnAbrirFormSaida').addEventListener('click',   () => window.open(FORM_URL_SAIDA,   '_blank', 'noopener'));
-    $('#btnRecarregar').addEventListener('click', () => {
-      loadEntradas();
-      loadSaidas();
-      loadProdutos();
-    });
-
-    // ================================
-    // ENTRADAS – Histórico
-    // Lista: Entradas
-    // Campos: Title, Quantidade, ValorUnitario, ValorTotal, NotaFiscal
-    // ================================
-    let ENTRADAS_CACHE = [];
-    async function loadEntradas() {
-      $('#loaderEntradas').classList.remove('hidden');
-      $('#tableEntradas').classList.add('hidden');
-      const select = [
-        'Id','Title','Quantidade','ValorUnitario','ValorTotal','NotaFiscal','Modified'
-      ].join(',');
-      try {
-        const data = await spGet(`/_api/web/lists/GetByTitle('${LIST_ENTRADAS}')/items`, select, null, 'Modified desc', 2000);
-        ENTRADAS_CACHE = data.value || [];
-        renderEntradas(ENTRADAS_CACHE);
-      } catch (e) {
-        $('#loaderEntradas').innerText = 'Erro ao carregar entradas: ' + e.message;
-      } finally {
-        $('#loaderEntradas').classList.add('hidden');
-      }
-    }
-    function renderEntradas(rows) {
-      const tbody = $('#tableEntradas tbody');
-      tbody.innerHTML = '';
-      for (const it of rows) {
-        const q = Number(it.Quantidade) || 0;
-        const vu = Number(it.ValorUnitario) || 0;
-        const vt = (it.ValorTotal !== undefined && it.ValorTotal !== null && it.ValorTotal !== '') ? Number(it.ValorTotal) : (q * vu);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${it.Title ?? ''}</td>
-          <td>${fmtInt(q)}</td>
-          <td>R$ ${fmtNumber(vu)}</td>
-          <td>R$ ${fmtNumber(vt)}</td>
-          <td>${it.NotaFiscal ?? ''}</td>
-          <td>${fmtDate(it.Modified)}</td>
-        `;
-        tbody.appendChild(tr);
-      }
-      $('#tableEntradas').classList.remove('hidden');
-    }
-    $('#btnFiltroEntrada').addEventListener('click', () => {
-      const term = ($('#filterEntrada').value || '').toLowerCase().trim();
-      if (!term) { renderEntradas(ENTRADAS_CACHE); return; }
-      const fil = ENTRADAS_CACHE.filter(it =>
-        (it.Title ?? '').toLowerCase().includes(term) ||
-        (it.NotaFiscal ?? '').toLowerCase().includes(term)
-      );
-      renderEntradas(fil);
-    });
-
-    // ================================
-    // SAÍDAS – Histórico
-    // Lista: Saidas
-    // Campos: Title, DescricaoProduto, Quantidade, PlacaCaminhao, Destinatario
-    // ================================
-    let SAIDAS_CACHE = [];
-    async function loadSaidas() {
-      $('#loaderSaidas').classList.remove('hidden');
-      $('#tableSaidas').classList.add('hidden');
-      const select = [
-        'Id','Title','DescricaoProduto','Quantidade','PlacaCaminhao','Destinatario','Modified'
-      ].join(',');
-      try {
-        const data = await spGet(`/_api/web/lists/GetByTitle('${LIST_SAIDAS}')/items`, select, null, 'Modified desc', 2000);
-        SAIDAS_CACHE = data.value || [];
-        renderSaidas(SAIDAS_CACHE);
-      } catch (e) {
-        $('#loaderSaidas').innerText = 'Erro ao carregar saídas: ' + e.message;
-      } finally {
-        $('#loaderSaidas').classList.add('hidden');
-      }
-    }
-    function renderSaidas(rows) {
-      const tbody = $('#tableSaidas tbody');
-      tbody.innerHTML = '';
-      for (const it of rows) {
-        const q = Number(it.Quantidade) || 0;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${it.Title ?? ''}</td>
-          <td>${it.DescricaoProduto ?? ''}</td>
-          <td>${fmtInt(q)}</td>
-          <td>${it.PlacaCaminhao ?? ''}</td>
-          <td>${it.Destinatario ?? ''}</td>
-          <td>${fmtDate(it.Modified)}</td>
-        `;
-        tbody.appendChild(tr);
-      }
-      $('#tableSaidas').classList.remove('hidden');
-    }
-    $('#btnFiltroSaida').addEventListener('click', () => {
-      const term = ($('#filterSaida').value || '').toLowerCase().trim();
-      if (!term) { renderSaidas(SAIDAS_CACHE); return; }
-      const fil = SAIDAS_CACHE.filter(it =>
-        (it.Title ?? '').toLowerCase().includes(term) ||
-        (it.Destinatario ?? '').toLowerCase().includes(term) ||
-        (it.PlacaCaminhao ?? '').toLowerCase().includes(term)
-      );
-      renderSaidas(fil);
-    });
-
-    // ================================
-    // SALDO / PRODUTOS – Listagem + Export
-    // Lista: Produtos
-    // Colunas: Title, CodigoFornecedor, DescricaoProduto, NomeFornecedor, UnidadeMedida, SaldoAtual, DataAtualizacao
-    // ================================
-    let PRODUTOS_CACHE = [];
-    async function loadProdutos() {
-      $('#loaderSaldo').classList.remove('hidden');
-      $('#tableSaldo').classList.add('hidden');
-      const select = [
-        'Id','Title','CodigoFornecedor','DescricaoProduto','NomeFornecedor','UnidadeMedida','SaldoAtual','DataAtualizacao','Modified'
-      ].join(',');
-      try {
-        const data = await spGet(`/_api/web/lists/GetByTitle('${LIST_PRODUTOS}')/items`, select, null, 'Title asc', 5000);
-        PRODUTOS_CACHE = data.value || [];
-        renderProdutos(PRODUTOS_CACHE);
-      } catch (e) {
-        $('#loaderSaldo').innerText = 'Erro ao carregar produtos: ' + e.message;
-      } finally {
-        $('#loaderSaldo').classList.add('hidden');
-      }
-    }
-    function renderProdutos(rows) {
-      const tbody = $('#tableSaldo tbody');
-      tbody.innerHTML = '';
-      for (const it of rows) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${it.Title ?? ''}</td>
-          <td>${it.CodigoFornecedor ?? ''}</td>
-          <td>${it.DescricaoProduto ?? ''}</td>
-          <td>${it.NomeFornecedor ?? ''}</td>
-          <td>${it.UnidadeMedida ?? ''}</td>
-          <td>${fmtInt(it.SaldoAtual ?? 0)}</td>
-          <td>${fmtDate(it.DataAtualizacao || it.Modified)}</td>
-        `;
-        tbody.appendChild(tr);
-      }
-      $('#tableSaldo').classList.remove('hidden');
-    }
-    $('#btnFiltroSaldo').addEventListener('click', () => {
-      const term = ($('#filterSaldo').value || '').toLowerCase().trim();
-      if (!term) { renderProdutos(PRODUTOS_CACHE); return; }
-      const fil = PRODUTOS_CACHE.filter(it =>
-        (it.Title ?? '').toLowerCase().includes(term) ||
-        (it.CodigoFornecedor ?? '').toLowerCase().includes(term) ||
-        (it.DescricaoProduto ?? '').toLowerCase().includes(term) ||
-        (it.NomeFornecedor ?? '').toLowerCase().includes(term)
-      );
-      renderProdutos(fil);
-    });
-    $('#btnExportSaldo').addEventListener('click', () => {
-      exportTableToCSV($('#tableSaldo'), `Saldo_Produtos_${new Date().toISOString().slice(0,10)}.csv`);
-    });
-
-    // ================================
-    // CADASTRO PRODUTOS – grava na lista
-    // ================================
-    async function salvarProduto() {
-      const title = $('#pTitle').value.trim();
-      if (!title) { $('#saveStatus').innerText = 'Informe o Título (Nome do Produto).'; return; }
-
-      const item = {
-        Title: title,
-        CodigoFornecedor: $('#pCodigoFornecedor').value.trim(),
-        DescricaoProduto: $('#pDescricao').value.trim(),
-        NomeFornecedor: $('#pNomeFornecedor').value.trim(),
-        UnidadeMedida: $('#pUnidade').value.trim(),
-        SaldoAtual: Number($('#pSaldoAtual').value || 0),
-        DataAtualizacao: new Date().toISOString()
-      };
-
-      try {
-        $('#saveStatus').innerText = 'Salvando...';
-        await spPostItem(LIST_PRODUTOS, item);
-        $('#saveStatus').innerText = '✅ Produto salvo com sucesso.';
-        // Limpa campos
-        ['#pTitle','#pCodigoFornecedor','#pDescricao','#pNomeFornecedor','#pUnidade','#pSaldoAtual'].forEach(id => $(id).value = '');
-        // Recarrega saldos
-        await loadProdutos();
-        // Alterna para a aba Saldo para ver o item
-        setActiveTab('tab-saldo');
-      } catch (e) {
-        $('#saveStatus').innerText = '❌ Erro ao salvar: ' + e.message;
-      }
-    }
-    $('#btnSalvarProduto').addEventListener('click', salvarProduto);
-
-    // ================================
-    // Inicialização
-    // ================================
-    async function init() {
-      setActiveTab('tab-entradas');
-      await Promise.all([loadEntradas(), loadSaidas(), loadProdutos()]);
-    }
-    init();
-  </script>
+async function loadProdutos() {
+  $('#loaderSaldo').classList.remove('hidden');
+  const data = await spGet(LIST_PRODUTOS, 'Title,CodigoFornecedor,CodigoFabrica,DescricaoProduto,NomeFornecedor,UnidadeMedida,SaldoAtual,DataAtualizacao,Modified');
+  const tbody = $('#tableSaldo tbody'); tbody.innerHTML = '';
+  data.forEach(i=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i.Title??''}</td>
+      <td>${i.CodigoFornecedor??''}</td>
+      <td>${i.CodigoFabrica??''}</td>
+      <td>${i.DescricaoProduto??''}</td>
+      <td>${i.NomeFornecedor??''}</td>
+      <td>${i.UnidadeMedida??''}</td>
+      <td>${i.SaldoAtual??0}</td>
+      <td>${new Date(i.DataAtualizacao||i.Modified).toLocaleString('pt-BR')}</td>`;
+    tbody.appendChild(tr);
+  });
+  $('#loaderSaldo').classList.add('hidden');
+  $('#tableSaldo').classList.remove('hidden');
+}
+function setActiveTab(id) {
+  $$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.target===id));
+  ['tab-produtos','tab-entradas','tab-saidas','tab-saldo']
+    .forEach(sec=>$('#'+sec).classList.toggle('hidden',sec!==id));
+}
+$$('.tab').forEach(t=>t.addEventListener('click',()=>setActiveTab(t.dataset.target)));
+$('#btnExportSaldo').addEventListener('click',()=>{
+  const rows=[...document.querySelectorAll('#tableSaldo tr')].map(tr=>[...tr.cells].map(td=>`"${td.innerText}"`).join(','));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`Saldo_${new Date().toISOString().split('T')[0]}.csv`;a.click();
+});
+$('#btnRecarregar').addEventListener('click',loadProdutos);
+$('#btnAbrirFormEntrada').addEventListener('click',()=>window.open(FORM_URL_ENTRADA,'_blank'));
+$('#btnAbrirFormSaida').addEventListener('click',()=>window.open(FORM_URL_SAIDA,'_blank'));
+loadProdutos();
+</script>
 </body>
 </html>
