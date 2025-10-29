@@ -6,51 +6,66 @@
 <title>Sistema de Estoque - BORA Transportes</title>
 <style>
   body{font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;margin:0;color:#222}
-  header{background:#1f4e8c;color:#fff;padding:16px;text-align:center}
-  nav{display:flex;gap:12px;justify-content:center;background:#e6edf5;padding:12px;flex-wrap:wrap}
-  button{padding:10px 16px;border:0;border-radius:6px;background:#1f4e8c;color:#fff;font-weight:700;cursor:pointer}
+  header{background:#1f4e8c;color:#fff;padding:22px;text-align:center;font-size:22px;font-weight:bold}
+  nav{display:flex;gap:20px;justify-content:center;background:#e6edf5;padding:20px;flex-wrap:wrap}
+  button{padding:14px 24px;border:0;border-radius:10px;background:#1f4e8c;color:#fff;font-weight:700;cursor:pointer;font-size:18px}
   button:hover{background:#2b6cb0}
-  section{display:none;max-width:1100px;margin:18px auto;background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  section{display:none;max-width:1200px;margin:30px auto;background:#fff;padding:28px;border-radius:12px;box-shadow:0 3px 12px rgba(0,0,0,.08)}
   section.active{display:block}
-  h2{color:#1f4e8c;margin:0 0 12px}
-  table{width:100%;border-collapse:collapse;margin-top:14px}
-  th,td{border:1px solid #d9e2ef;padding:8px;text-align:left;font-size:14px}
+  h2{color:#1f4e8c;margin:0 0 20px;font-size:28px}
+  table{width:100%;border-collapse:collapse;margin-top:18px;font-size:17px}
+  th,td{border:1px solid #d9e2ef;padding:10px;text-align:left}
   th{background:#f2f6fc}
-  .muted{color:#667da0;font-size:13px}
-  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
   .right{margin-left:auto}
-  .filters-row input{width:100%;padding:6px;font-size:12px}
-  .btn-exportar{background-color:#0078d4;color:white;border:none;padding:8px 14px;border-radius:6px;font-weight:bold;cursor:pointer}
+  .btn-exportar{background-color:#0078d4;color:white;border:none;padding:12px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:16px}
   .btn-exportar:hover{background-color:#005a9e}
+  .btn-voltar{background:#999;color:#fff;padding:10px 18px;border:0;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer}
+  .btn-voltar:hover{background:#777}
+  /* tela inicial */
+  #home{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70vh;background:#f7faff;box-shadow:none}
+  #home button{font-size:22px;padding:18px 40px;margin:10px;border-radius:12px}
+  #resumoSaldo{font-size:18px;margin-bottom:10px;font-weight:bold;color:#1f4e8c}
 </style>
 </head>
 <body>
 
-<header><h1>📦 Sistema de Estoque – BORA Transportes</h1></header>
+<header>Sistema de Estoque – BORA Transportes</header>
 
 <nav>
-  <button onclick="abrirForm('cadastro')">Cadastro (Form)</button>
-  <button onclick="abrirForm('entrada')">Entrada (Form)</button>
-  <button onclick="abrirForm('saida')">Saída (Form)</button>
+  <button onclick="mostrar('home')">Início</button>
+  <button onclick="abrirForm('cadastro')">Cadastro</button>
+  <button onclick="abrirForm('entrada')">Entrada</button>
+  <button onclick="abrirForm('saida')">Saída</button>
   <button onclick="mostrar('historico')">Histórico</button>
   <button onclick="mostrar('saldo')">Saldo</button>
 </nav>
 
-<!-- HOME LIMPA -->
-<section id="home" class="active"></section>
+<!-- TELA INICIAL -->
+<section id="home" class="active">
+  <button onclick="abrirForm('cadastro')">Cadastro de Produtos</button>
+  <button onclick="abrirForm('entrada')">Entrada de Materiais</button>
+  <button onclick="abrirForm('saida')">Saída de Materiais</button>
+  <button onclick="mostrar('historico')">Histórico</button>
+  <button onclick="mostrar('saldo')">Saldo Atual</button>
+</section>
 
-<!-- HISTÓRICO COM SELETOR -->
+<!-- HISTÓRICO -->
 <section id="historico">
-  <h2>📜 Histórico</h2>
+  <div class="toolbar">
+    <h2>Histórico</h2>
+    <button class="btn-voltar right" onclick="mostrar('home')">Voltar</button>
+  </div>
+
   <div class="toolbar">
     <label for="tipoHistorico"><b>Selecionar:</b></label>
-    <select id="tipoHistorico" onchange="mudarHistorico()">
+    <select id="tipoHistorico" onchange="mudarHistorico()" style="font-size:16px;padding:6px">
       <option value="entrada">Entradas</option>
       <option value="saida">Saídas</option>
     </select>
-    <button onclick="recarregarHistorico()">🔄 Recarregar</button>
-    <input id="filtroHistorico" placeholder="Filtrar..." style="flex:1;max-width:300px">
-    <span class="muted right" id="infoHistorico">—</span>
+    <button onclick="recarregarHistorico()">Recarregar</button>
+    <input id="filtroHistorico" placeholder="Filtrar..." style="flex:1;max-width:340px;padding:8px;font-size:15px">
+    <span class="right" id="infoHistorico" style="font-size:15px;color:#555">—</span>
   </div>
 
   <table id="tabelaHistorico">
@@ -61,12 +76,19 @@
 
 <!-- SALDO -->
 <section id="saldo">
-  <h2>📊 Saldo de Produtos</h2>
   <div class="toolbar">
-    <button onclick="carregarProdutos()">🔄 Recarregar</button>
-    <button class="btn-exportar" onclick="exportarCSV()">⬇️ Exportar Planilha</button>
-    <span id="saldoInfo" class="muted right">—</span>
+    <h2>Saldo de Produtos</h2>
+    <button class="btn-voltar right" onclick="mostrar('home')">Voltar</button>
   </div>
+
+  <div id="resumoSaldo">Total de produtos: 0 | Soma total de estoque: 0</div>
+
+  <div class="toolbar">
+    <button onclick="carregarProdutos()">Recarregar</button>
+    <button class="btn-exportar" onclick="exportarCSV()">Exportar Planilha</button>
+    <span id="saldoInfo" class="right" style="font-size:15px;color:#555">—</span>
+  </div>
+
   <table id="tableSaldo">
     <thead>
       <tr>
@@ -78,32 +100,22 @@
         <th>Saldo Atual</th>
         <th>Data Atualização</th>
       </tr>
-      <tr class="filters-row">
-        <th><input data-col="Title" placeholder="Filtrar título"></th>
-        <th><input data-col="CodigoFornecedor" placeholder="Filtrar cód. fornecedor"></th>
-        <th><input data-col="DescricaoProduto" placeholder="Filtrar descrição"></th>
-        <th><input data-col="NomeFornecedor" placeholder="Filtrar fornecedor"></th>
-        <th><input data-col="UnidadeMedida" placeholder="Filtrar unidade"></th>
-        <th><input data-col="SaldoAtual" placeholder="=, >, < (ex. >10)"></th>
-        <th><input data-col="DataAtualizacao" placeholder="aaaa-mm-dd"></th>
-      </tr>
     </thead>
     <tbody></tbody>
   </table>
 </section>
 
 <script>
-/* CONFIGURAÇÃO */
-const FORM_CAD = "https://forms.microsoft.com/r/cYKFvRQbRV";
-const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
-const FORM_SAIDA = "https://forms.microsoft.com/r/n2Rr51aG6s";
+/* CONFIG */
+const FORM_CAD="https://forms.microsoft.com/r/cYKFvRQbRV";
+const FORM_ENTRADA="https://forms.microsoft.com/r/8EaCX7pKRQ";
+const FORM_SAIDA="https://forms.microsoft.com/r/n2Rr51aG6s";
+const CSV_URL_ENTRADAS="";
+const CSV_URL_SAIDAS="";
+const CSV_URL_PRODUTOS="";
+const USE_MOCK=!CSV_URL_ENTRADAS||!CSV_URL_SAIDAS||!CSV_URL_PRODUTOS;
 
-const CSV_URL_ENTRADAS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B9E196987-794A-4F5D-9E9A-30A4B2399843%7D&file=Entradas.xlsx&action=default&mobileredirect=true"; 
-const CSV_URL_SAIDAS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B45A6FF48-01FE-43D0-9D9C-2089BBD49A74%7D&file=Sa%C3%ADdas.xlsx&action=default&mobileredirect=true";   
-const CSV_URL_PRODUTOS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7BE60CFD50-65D1-4A1F-90D7-D244669002D9%7D&file=Produtos.xlsx&action=default&mobileredirect=true"; 
-const USE_MOCK = !CSV_URL_ENTRADAS || !CSV_URL_SAIDAS || !CSV_URL_PRODUTOS;
-
-/* LAYOUT */
+/* NAVEGAÇÃO */
 function mostrar(id){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -111,83 +123,108 @@ function mostrar(id){
   if(id==='saldo') carregarProdutos();
 }
 function abrirForm(tipo){
-  if(tipo==='cadastro') window.open(FORM_CAD,'_blank','noopener');
-  if(tipo==='entrada') window.open(FORM_ENTRADA,'_blank','noopener');
-  if(tipo==='saida') window.open(FORM_SAIDA,'_blank','noopener');
+  if(tipo==='cadastro')window.open(FORM_CAD,'_blank','noopener');
+  if(tipo==='entrada')window.open(FORM_ENTRADA,'_blank','noopener');
+  if(tipo==='saida')window.open(FORM_SAIDA,'_blank','noopener');
 }
 
-/* CSV UTILS */
-async function fetchCSV(url){ const r=await fetch(url,{cache:'no-store'}); return await r.text();}
-function parseCSV(text){ const l=text.trim().split('\n'); const h=l[0].split(','); return l.slice(1).map(row=>{const c=row.split(',');const o={};h.forEach((x,i)=>o[x]=c[i]);return o;});}
-function num(x){return Number(x)||0;}
-const fmtBR = n => Number(n).toLocaleString('pt-BR',{maximumFractionDigits:2});
-
-/* MOCK */
-const MOCK_ENTRADAS=[{Title:"Parafuso",Quantidade:"10",ValorUnitario:"2",ValorTotal:"20",NotaFiscal:"NF01",Modified:"2025-10-10"}];
-const MOCK_SAIDAS=[{Title:"Arruela",DescricaoProduto:"Arruela Aço",Quantidade:"5",PlacaCaminhao:"ABC1234",Destinatario:"Cliente Z",Modified:"2025-10-11"}];
-const MOCK_PRODUTOS=[{Title:"Parafuso",CodigoFornecedor:"CF01",DescricaoProduto:"Parafuso M8",NomeFornecedor:"ACME",UnidadeMedida:"un",SaldoAtual:"200",DataAtualizacao:"2025-10-11"}];
+/* CSV */
+async function fetchCSV(url){
+  const r=await fetch(url,{cache:'no-store'});
+  return await r.text();
+}
+function parseCSV(t){
+  const l=t.trim().split('\n');
+  const h=l[0].split(',');
+  return l.slice(1).map(r=>{
+    const c=r.split(',');
+    const o={};
+    h.forEach((x,i)=>o[x]=c[i]);
+    return o;
+  });
+}
+const fmtBR=n=>Number(n).toLocaleString('pt-BR',{maximumFractionDigits:2});
 
 /* HISTÓRICO */
 let HIST_CACHE=[];
-async function mudarHistorico(){ 
+async function mudarHistorico(){
   const tipo=document.getElementById('tipoHistorico').value;
-  const th=document.querySelector('#tabelaHistorico thead'); const tb=document.querySelector('#tabelaHistorico tbody');
-  th.innerHTML=""; tb.innerHTML="";
+  const th=document.querySelector('#tabelaHistorico thead');
+  const tb=document.querySelector('#tabelaHistorico tbody');
+  th.innerHTML="";tb.innerHTML="";
   if(tipo==='entrada'){
     th.innerHTML="<tr><th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th><th>Atualização</th></tr>";
     carregarHistorico('entrada');
-  } else {
+  }else{
     th.innerHTML="<tr><th>Título</th><th>Descrição Produto</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th><th>Atualização</th></tr>";
     carregarHistorico('saida');
   }
 }
 async function carregarHistorico(tipo){
-  const url = tipo==='entrada'?CSV_URL_ENTRADAS:CSV_URL_SAIDAS;
+  const url=tipo==='entrada'?CSV_URL_ENTRADAS:CSV_URL_SAIDAS;
   try{
-    if(USE_MOCK){HIST_CACHE = tipo==='entrada'?MOCK_ENTRADAS:MOCK_SAIDAS;}
-    else {const csv=await fetchCSV(url); HIST_CACHE=parseCSV(csv);}
+    if(USE_MOCK){HIST_CACHE=[];}
+    else{const csv=await fetchCSV(url);HIST_CACHE=parseCSV(csv);}
     renderHistorico(tipo);
-  }catch(e){document.getElementById('infoHistorico').textContent='Erro: '+e.message;}
+  }catch(e){
+    document.getElementById('infoHistorico').textContent='Erro: '+e.message;
+  }
 }
 function renderHistorico(tipo){
-  const tb=document.querySelector('#tabelaHistorico tbody'); tb.innerHTML="";
+  const tb=document.querySelector('#tabelaHistorico tbody');
+  tb.innerHTML="";
   const f=document.getElementById('filtroHistorico').value.toLowerCase();
   let count=0;
-  HIST_CACHE.filter(r=>!f || Object.values(r).some(v=>String(v).toLowerCase().includes(f)))
-  .forEach(i=>{
+  HIST_CACHE.filter(r=>!f||Object.values(r).some(v=>String(v).toLowerCase().includes(f))).forEach(i=>{
     const tr=document.createElement('tr');
-    if(tipo==='entrada') tr.innerHTML=`<td>${i.Title}</td><td>${i.Quantidade}</td><td>${i.ValorUnitario}</td><td>${i.ValorTotal}</td><td>${i.NotaFiscal}</td><td>${i.Modified}</td>`;
-    else tr.innerHTML=`<td>${i.Title}</td><td>${i.DescricaoProduto}</td><td>${i.Quantidade}</td><td>${i.PlacaCaminhao}</td><td>${i.Destinatario}</td><td>${i.Modified}</td>`;
-    tb.appendChild(tr); count++;
+    if(tipo==='entrada')
+      tr.innerHTML=`<td>${i.Title||''}</td><td>${i.Quantidade||''}</td><td>${i.ValorUnitario||''}</td><td>${i.ValorTotal||''}</td><td>${i.NotaFiscal||''}</td><td>${i.Modified||''}</td>`;
+    else
+      tr.innerHTML=`<td>${i.Title||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.Quantidade||''}</td><td>${i.PlacaCaminhao||''}</td><td>${i.Destinatario||''}</td><td>${i.Modified||''}</td>`;
+    tb.appendChild(tr);
+    count++;
   });
   document.getElementById('infoHistorico').textContent=`Registros: ${count}`;
 }
 function recarregarHistorico(){mudarHistorico();}
-document.getElementById('filtroHistorico').addEventListener('input',()=>mudarHistorico());
 
 /* SALDO */
 let PROD_CACHE=[];
 async function carregarProdutos(){
   try{
-    if(USE_MOCK){PROD_CACHE=MOCK_PRODUTOS;}
-    else{const csv=await fetchCSV(CSV_URL_PRODUTOS);PROD_CACHE=parseCSV(csv);}
+    if(USE_MOCK){PROD_CACHE=[];}
+    else{
+      const csv=await fetchCSV(CSV_URL_PRODUTOS);
+      PROD_CACHE=parseCSV(csv);
+    }
     renderSaldo(PROD_CACHE);
-  }catch(e){document.getElementById('saldoInfo').textContent='Erro: '+e.message;}
+  }catch(e){
+    document.getElementById('saldoInfo').textContent='Erro: '+e.message;
+  }
 }
 function renderSaldo(rows){
-  const tb=document.querySelector('#tableSaldo tbody'); tb.innerHTML="";
+  const tb=document.querySelector('#tableSaldo tbody');
+  tb.innerHTML="";
+  let totalItens=rows.length;
+  let soma=0;
   rows.forEach(i=>{
+    const saldo=Number(i.SaldoAtual)||0;
+    soma+=saldo;
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i.Title}</td><td>${i.CodigoFornecedor}</td><td>${i.DescricaoProduto}</td><td>${i.NomeFornecedor}</td><td>${i.UnidadeMedida}</td><td>${fmtBR(i.SaldoAtual)}</td><td>${i.DataAtualizacao}</td>`;
+    tr.innerHTML=`<td>${i.Title||''}</td><td>${i.CodigoFornecedor||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.NomeFornecedor||''}</td><td>${i.UnidadeMedida||''}</td><td>${fmtBR(saldo)}</td><td>${i.DataAtualizacao||''}</td>`;
     tb.appendChild(tr);
   });
-  document.getElementById('saldoInfo').textContent=`Itens: ${rows.length}`;
+  document.getElementById('saldoInfo').textContent=`Itens: ${totalItens}`;
+  document.getElementById('resumoSaldo').textContent=`Total de produtos: ${totalItens} | Soma total de estoque: ${fmtBR(soma,0)}`;
 }
 function exportarCSV(){
   const table=document.getElementById('tableSaldo');
   const rows=[...table.rows].map(tr=>[...tr.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
   const blob=new Blob([rows.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
 
 (function init(){mostrar('home');})();
