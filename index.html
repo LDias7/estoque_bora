@@ -4,37 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bora Transportes - Controle de Estoque</title>
-
 <style>
 :root {
   --cor-primaria: #002855;
   --cor-secundaria: #ffffff;
   --cor-fundo: #f4f4f9;
-  --cor-alerta: #dc3545;
-  --cor-terciaria: #6c757d;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding-top:60px;}
 .main-header{width:100%;background:var(--cor-primaria);color:var(--cor-secundaria);text-align:center;padding:20px 0;position:fixed;top:0;left:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,0.2);}
-.screen{background:var(--cor-secundaria);padding:40px;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.1);width:90%;max-width:900px;margin-top:100px;margin-bottom:40px;display:none;}
+.screen{background:#fff;padding:40px;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.1);width:90%;max-width:900px;margin-top:100px;display:none;}
 .screen.active{display:block;}
-.sub-title{text-align:center;color:var(--cor-primaria);margin-bottom:25px;}
 .button-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.main-button{background:var(--cor-primaria);color:var(--cor-secundaria);border:none;padding:25px 15px;font-size:1.2em;font-weight:bold;border-radius:6px;cursor:pointer;transition:.3s;}
+.main-button{background:var(--cor-primaria);color:white;border:none;padding:25px;font-size:1.1em;font-weight:bold;border-radius:6px;cursor:pointer;}
 .main-button:hover{background:#003366;}
-.data-display{background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:4px;margin-bottom:20px;border-left:5px solid var(--cor-primaria);}
-.btn-voltar{display:block;margin:20px auto 0 auto;padding:12px 25px;font-size:1em;font-weight:bold;border:none;border-radius:6px;background:#ccc;color:#000;cursor:pointer;transition:.3s;}
-.btn-voltar:hover{background:#aaa;}
-.saldo-input{width:100%;padding:15px;border:2px solid var(--cor-primaria);border-radius:8px;font-size:1.1em;margin-bottom:20px;transition:.3s;}
-.saldo-input:focus{outline:none;box-shadow:0 0 5px var(--cor-primaria);}
-.resultado-saldo{background:#f8f9fa;border-left:5px solid var(--cor-primaria);padding:20px;border-radius:8px;}
+.action-button{padding:12px 20px;font-weight:bold;border:none;border-radius:5px;cursor:pointer;}
+.action-button.secondary{background:#ccc;}
+iframe{width:100%;height:80vh;border:2px solid var(--cor-primaria);border-radius:8px;}
+.sub-title{text-align:center;color:var(--cor-primaria);margin-bottom:25px;}
 </style>
 </head>
 
 <body>
 <header class="main-header"><h1>Sistema de Gestão de Estoque</h1></header>
 
-<!-- MENU PRINCIPAL -->
 <main id="tela-principal" class="screen active">
   <h2 class="sub-title">Selecione uma Opção</h2>
   <div class="button-grid">
@@ -45,97 +38,68 @@ body{font-family:sans-serif;background:var(--cor-fundo);color:#333;display:flex;
   </div>
 </main>
 
-<!-- CADASTRO -->
-<div id="tela-cadastro" class="screen">
-  <h2 class="sub-title">Cadastro de Produto</h2>
-  <div class="data-display">
-    <p>📝 Clique no botão abaixo para abrir o formulário de cadastro do Microsoft Forms.</p>
+<div id="tela-forms" class="screen">
+  <h2 class="sub-title" id="titulo-forms">Formulário</h2>
+  <iframe id="iframe-forms"></iframe>
+  <div style="text-align:center;margin-top:20px;">
+    <button class="action-button secondary" id="btn-voltar-forms">Voltar</button>
   </div>
-  <button id="abrirCadastro" class="main-button" style="width:100%;">Abrir Formulário de Cadastro</button>
-  <button class="btn-voltar" id="btn-voltar-cadastro">Voltar</button>
 </div>
 
-<!-- ENTRADA -->
-<div id="tela-entrada" class="screen">
-  <h2 class="sub-title">Registro de Entrada</h2>
-  <div class="data-display">
-    <p>📦 Clique no botão abaixo para registrar uma nova entrada de produto.</p>
-  </div>
-  <button id="abrirEntrada" class="main-button" style="width:100%;">Abrir Formulário de Entrada</button>
-  <button class="btn-voltar" id="btn-voltar-entrada">Voltar</button>
-</div>
-
-<!-- SAÍDA -->
-<div id="tela-saida" class="screen">
-  <h2 class="sub-title">Registro de Saída</h2>
-  <div class="data-display">
-    <p>🚚 Clique no botão abaixo para registrar uma nova saída de produto.</p>
-  </div>
-  <button id="abrirSaida" class="main-button" style="width:100%;">Abrir Formulário de Saída</button>
-  <button class="btn-voltar" id="btn-voltar-saida">Voltar</button>
-</div>
-
-<!-- SALDO -->
 <div id="tela-saldo" class="screen">
   <h2 class="sub-title">Consulta de Saldo</h2>
-  <input type="text" id="campo-busca" class="saldo-input" placeholder="🔍 Digite o código de fábrica ou descrição do produto...">
-  <div id="resultado-saldo" class="resultado-saldo">
-    <p><strong>Produto:</strong> —</p>
-    <p><strong>Código de Fábrica:</strong> —</p>
-    <p><strong>Saldo Atual:</strong> —</p>
+  <div style="margin-bottom:15px;">
+    <input id="codigoBusca" placeholder="Digite o código do produto..." style="width:100%;padding:10px;border-radius:5px;border:1px solid #ccc;">
   </div>
-  <button class="btn-voltar" id="btn-voltar-saldo">Voltar</button>
+  <button id="btn-buscar" class="main-button" style="width:100%;">Buscar</button>
+  <iframe id="iframe-saldo" style="display:none;margin-top:20px;height:70vh;"></iframe>
+  <div style="text-align:center;margin-top:20px;">
+    <button class="action-button secondary" id="btn-voltar-saldo">Voltar</button>
+  </div>
 </div>
 
 <script>
-const FORM_CADASTRO = "https://forms.microsoft.com/r/cYKFvRQbRV";
-const FORM_ENTRADA = "https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUODg1NjJLTEYzOFRaVjlGMFEwWDJVSEVWWi4u";
-const FORM_SAIDA = "https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUMEg4TTdMVVJaUktJTlpPR1NCQjBITllISS4u";
+document.addEventListener("DOMContentLoaded", ()=>{
+  const telas=document.querySelectorAll(".screen");
+  const iframeForms=document.getElementById("iframe-forms");
+  const tituloForms=document.getElementById("titulo-forms");
+  const iframeSaldo=document.getElementById("iframe-saldo");
+  const FORMS_URL_PRODUTO="https://forms.office.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxURTRUMlpWNDQ2VTJJWUM0T05BTkVGRUdDRy4u&embed=true";
+  const FORMS_URL_ENTRADA="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUODg1NjJLTEYzOFRaVjlGMFEwWDJVSEVWWi4u&embed=true";
+  const FORMS_URL_SAIDA="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=V2vtxCDuGECFbJBsQgFoSMHt4qeT3V1Djd4VrtFsitxUMEg4TTdMVVJaUktJTlpPR1NCQjBITllISS4u&embed=true";
+  const LISTA_PRODUTOS_URL="https://borexpress.sharepoint.com/sites/estoque/Lists/Produtos/AllItems.aspx?FilterField1=Title&FilterValue1=";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const telas = document.querySelectorAll(".screen");
-  const mostrarTela = id => {
-    telas.forEach(t => t.classList.remove("active"));
+  function mostrarTela(id){
+    telas.forEach(t=>t.classList.remove("active"));
     document.getElementById(id).classList.add("active");
     window.scrollTo(0,0);
+  }
+
+  document.getElementById("btn-cadastro").onclick=()=>{
+    iframeForms.src=FORMS_URL_PRODUTO;
+    tituloForms.textContent="Cadastro de Produto";
+    mostrarTela("tela-forms");
   };
-  document.getElementById("btn-cadastro").onclick = () => mostrarTela("tela-cadastro");
-  document.getElementById("btn-entrada").onclick = () => mostrarTela("tela-entrada");
-  document.getElementById("btn-saida").onclick = () => mostrarTela("tela-saida");
-  document.getElementById("btn-saldo").onclick = () => mostrarTela("tela-saldo");
-  document.getElementById("btn-voltar-cadastro").onclick = () => mostrarTela("tela-principal");
-  document.getElementById("btn-voltar-entrada").onclick = () => mostrarTela("tela-principal");
-  document.getElementById("btn-voltar-saida").onclick = () => mostrarTela("tela-principal");
-  document.getElementById("btn-voltar-saldo").onclick = () => mostrarTela("tela-principal");
+  document.getElementById("btn-entrada").onclick=()=>{
+    iframeForms.src=FORMS_URL_ENTRADA;
+    tituloForms.textContent="Registro de Entrada";
+    mostrarTela("tela-forms");
+  };
+  document.getElementById("btn-saida").onclick=()=>{
+    iframeForms.src=FORMS_URL_SAIDA;
+    tituloForms.textContent="Registro de Saída";
+    mostrarTela("tela-forms");
+  };
+  document.getElementById("btn-saldo").onclick=()=>mostrarTela("tela-saldo");
+  document.getElementById("btn-voltar-forms").onclick=()=>mostrarTela("tela-principal");
+  document.getElementById("btn-voltar-saldo").onclick=()=>mostrarTela("tela-principal");
 
-  document.getElementById("abrirCadastro").onclick = () => window.open(FORM_CADASTRO, "_blank");
-  document.getElementById("abrirEntrada").onclick = () => window.open(FORM_ENTRADA, "_blank");
-  document.getElementById("abrirSaida").onclick = () => window.open(FORM_SAIDA, "_blank");
-
-  const inputBusca = document.getElementById("campo-busca");
-  const resultado = document.getElementById("resultado-saldo");
-
-  inputBusca.addEventListener("keypress", async (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const codigo = inputBusca.value.trim();
-      if (!codigo) return alert("Digite um código ou descrição.");
-      resultado.innerHTML = "<p>🔄 Consultando saldo...</p>";
-      try {
-        const res = await fetch(`/api/saldoSharePoint?codigo=${codigo}`);
-        const data = await res.json();
-        if (data.error) throw new Error(data.error);
-        resultado.innerHTML = `
-          <p><strong>Produto:</strong> ${data.codigo}</p>
-          <p><strong>Entradas:</strong> ${data.entradas}</p>
-          <p><strong>Saídas:</strong> ${data.saidas}</p>
-          <p><strong>Saldo Atual:</strong> <span class="large-text">${data.saldo}</span></p>
-        `;
-      } catch (err) {
-        resultado.innerHTML = `<p style="color:red;">❌ Erro ao consultar: ${err.message}</p>`;
-      }
-    }
-  });
+  document.getElementById("btn-buscar").onclick=()=>{
+    const codigo=document.getElementById("codigoBusca").value.trim();
+    if(!codigo){alert("Digite o código do produto!");return;}
+    iframeSaldo.src=LISTA_PRODUTOS_URL+encodeURIComponent(codigo);
+    iframeSaldo.style.display="block";
+  };
 });
 </script>
 </body>
