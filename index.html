@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Estoque - BORA</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sistema de Estoque - BORA (Forms + CSV)</title>
 <style>
   body{font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;margin:0;color:#222}
   header{background:#1f4e8c;color:#fff;padding:16px;text-align:center}
@@ -35,29 +35,19 @@
 <header><h1>📦 Sistema de Estoque – BORA Transportes</h1></header>
 
 <nav>
-  <button onclick="mostrar('produtos')">Cadastro de Produtos</button>
+  <button onclick="abrirForm('cadastro')">Cadastro (Form)</button>
   <button onclick="abrirForm('entrada')">Entrada (Form)</button>
   <button onclick="abrirForm('saida')">Saída (Form)</button>
   <button onclick="mostrar('historico')">Histórico</button>
   <button onclick="mostrar('saldo')">Saldo</button>
 </nav>
 
-<!-- CADASTRO DE PRODUTOS (como estava) -->
-<section id="produtos" class="active">
-  <h2>🧾 Cadastro de Produtos</h2>
-  <p class="muted">Lista: <b>Produtos</b> — Campos: Título, CodigoFornecedor, DescricaoProduto, NomeFornecedor, UnidadeMedida, SaldoAtual, DataAtualizacao (auto).</p>
-  <div class="row">
-    <div class="col-3"><label>Título (Nome do Produto)</label><input id="pTitle" placeholder="Parafuso M8 x 20mm"></div>
-    <div class="col-3"><label>Código do Fornecedor</label><input id="pCodigoFornecedor" placeholder="CF-12345"></div>
-    <div class="col-3"><label>Descrição do Produto</label><input id="pDescricao" placeholder="Parafuso zincado sextavado"></div>
-    <div class="col-3"><label>Nome do Fornecedor</label><input id="pNomeFornecedor" placeholder="ACME Peças"></div>
-    <div class="col-3"><label>Unidade de Medida</label><input id="pUnidade" placeholder="un, cx, kg, m"></div>
-    <div class="col-3"><label>Saldo Atual</label><input id="pSaldoAtual" type="number" step="1" min="0" value="0"></div>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <button onclick="salvarProduto()">💾 Salvar Produto</button>
-    <span id="status" class="muted"></span>
-  </div>
+<!-- INFO -->
+<section id="home" class="active">
+  <h2>Bem-vindo</h2>
+  <p>Fluxo oficial: <b>Microsoft Forms</b> → <b>Power Automate</b> → <b>SharePoint</b>. <br>
+  Este front na Vercel: abre os Forms oficiais para lançar dados e exibe <b>Histórico</b> e <b>Saldo</b> a partir de CSV público (ou dados mock para teste).</p>
+  <p class="muted">Dica: publique três CSVs (Entradas, Saídas, Produtos) e cole as URLs no topo do script para usar dados reais.</p>
 </section>
 
 <!-- HISTÓRICO ENTRADAS/SAÍDAS -->
@@ -68,6 +58,7 @@
     <span class="pill">Entradas</span>
     <input id="filterEntradas" placeholder="Filtrar (título/nota fiscal)..." style="max-width:320px">
     <button onclick="carregarEntradas()">Recarregar</button>
+    <span id="infoEntradas" class="muted right">—</span>
   </div>
   <table id="tableEntradas">
     <thead>
@@ -82,6 +73,7 @@
     <span class="pill">Saídas</span>
     <input id="filterSaidas" placeholder="Filtrar (título/destinatário/placa)..." style="max-width:360px">
     <button onclick="carregarSaidas()">Recarregar</button>
+    <span id="infoSaidas" class="muted right">—</span>
   </div>
   <table id="tableSaidas">
     <thead>
@@ -132,15 +124,19 @@
 
 <script>
 /* ========= CONFIG ========= */
-const SITE = "https://borexpress.sharepoint.com/sites/EstoqueJC";
-const LIST_PRODUTOS = "Produtos";
-const LIST_ENTRADAS = "Entradas";
-const LIST_SAIDAS   = "Saidas";
-
-// Forms fornecidos
+// Links dos Forms oficiais (abrem em nova aba)
+const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
 const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
-const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV"; // (não utilizado na UI, mas deixei aqui)
+
+// (Opcional) URLs públicas dos CSVs REAIS (cole aqui quando tiver):
+// Observação: o cabeçalho do CSV deve corresponder aos campos esperados.
+const CSV_URL_ENTRADAS = ""; // ex: "https://.../Entradas.csv"
+const CSV_URL_SAIDAS   = ""; // ex: "https://.../Saidas.csv"
+const CSV_URL_PRODUTOS = ""; // ex: "https://.../Produtos.csv"
+
+// Se as URLs acima estiverem vazias, usamos MOCK (somente para teste visual).
+const USE_MOCK = !CSV_URL_ENTRADAS || !CSV_URL_SAIDAS || !CSV_URL_PRODUTOS;
 
 /* ========= LAYOUT CLÁSSICO ========= */
 function mostrar(id){
@@ -150,86 +146,101 @@ function mostrar(id){
   if(id==='saldo'){carregarProdutos();}
 }
 function abrirForm(tipo){
-  if(tipo==='entrada') window.open(FORM_ENTRADA,'_blank','noopener');
-  if(tipo==='saida')   window.open(FORM_SAIDA,'_blank','noopener');
+  if(tipo==='cadastro') window.open(FORM_CAD,'_blank','noopener');
+  if(tipo==='entrada')  window.open(FORM_ENTRADA,'_blank','noopener');
+  if(tipo==='saida')    window.open(FORM_SAIDA,'_blank','noopener');
+}
+
+/* ========= CSV PARSER (simples) ========= */
+async function fetchCSV(url){
+  const r = await fetch(url, { cache: 'no-store' });
+  if(!r.ok) throw new Error(`Falha ao baixar CSV: ${r.status}`);
+  return await r.text();
+}
+function parseCSV(text){
+  // Parser simples: divide por quebras de linha; separador vírgula; trata aspas duplas básicas
+  const lines = text.replace(/\r/g,'').split('\n').filter(l=>l.trim().length>0);
+  if(lines.length===0) return [];
+  const header = splitCSVLine(lines[0]).map(h => h.trim());
+  return lines.slice(1).map(line=>{
+    const cols = splitCSVLine(line);
+    const obj = {};
+    header.forEach((h,i)=>{ obj[h] = (cols[i]??'').trim(); });
+    return obj;
+  });
+}
+function splitCSVLine(line){
+  const out=[], re=/\s*(?:"([^"]*(?:""[^"]*)*)"|([^,]*))\s*(?:,|$)/g; // suporta "campo, com, vírgulas"
+  let m;
+  while((m=re.exec(line))!==null){
+    out.push(m[1] ? m[1].replace(/""/g,'"') : (m[2]||''));
+  }
+  return out;
 }
 
 /* ========= HELPERS ========= */
 const fmtBR = (n,dec=2)=>Number(n).toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec});
 function toDateStr(d){try{if(!d) return ""; const x=new Date(d); if(isNaN(x)) return ""; return x.toLocaleString('pt-BR')}catch{return ""}}
+function num(x){ if(x===null||x===undefined||x==="") return 0; const s=String(x).replace(/\./g,'').replace(',','.'); const n=Number(s); return isNaN(n)?0:n; }
+function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(null,a),ms)}}
 
-async function spGet(list, select, orderby, top=5000){
-  const qs = [
-    `$select=${encodeURIComponent(select)}`,
-    orderby?`$orderby=${encodeURIComponent(orderby)}`:"",
-    `$top=${top}`
-  ].filter(Boolean).join("&");
-  const r = await fetch(`${SITE}/_api/web/lists/GetByTitle('${list}')/items?${qs}`, { headers:{Accept:'application/json;odata=nometadata'} });
-  if(!r.ok){ throw new Error(`GET ${list} ${r.status}`); }
-  const j = await r.json(); return j.value||[];
-}
-async function spDigest(){
-  const r=await fetch(`${SITE}/_api/contextinfo`,{method:'POST',headers:{Accept:'application/json;odata=nometadata'}});
-  if(!r.ok) throw new Error('Digest falhou');
-  return (await r.json()).FormDigestValue;
-}
-async function spPost(list, obj){
-  const digest = await spDigest();
-  const r = await fetch(`${SITE}/_api/web/lists/GetByTitle('${list}')/items`, {
-    method:'POST',
-    headers:{
-      'Accept':'application/json;odata=nometadata',
-      'Content-Type':'application/json;odata=nometadata',
-      'X-RequestDigest':digest
-    },
-    body:JSON.stringify(obj)
-  });
-  if(!r.ok) throw new Error(await r.text());
-  return r.json();
+/* ========= MOCK DATA (somente para teste visual) ========= */
+const MOCK_ENTRADAS = [
+  { Title:"Parafuso M8", Quantidade:"100", ValorUnitario:"2.50", ValorTotal:"",  NotaFiscal:"NF123", Modified:"2025-10-20T10:22:00Z" },
+  { Title:"Arruela Aço", Quantidade:"200", ValorUnitario:"0.35", ValorTotal:"70", NotaFiscal:"NF124", Modified:"2025-10-21T11:40:00Z" }
+];
+const MOCK_SAIDAS = [
+  { Title:"Parafuso M8", DescricaoProduto:"Parafuso sextavado", Quantidade:"20", PlacaCaminhao:"ABC1D23", Destinatario:"Cliente X", Modified:"2025-10-22T09:05:00Z" },
+  { Title:"Arruela Aço", DescricaoProduto:"Arruela zincada",   Quantidade:"50", PlacaCaminhao:"DEF4G56", Destinatario:"Cliente Y", Modified:"2025-10-23T14:12:00Z" }
+];
+const MOCK_PRODUTOS = [
+  { Title:"Parafuso M8", CodigoFornecedor:"CF-12345", DescricaoProduto:"Parafuso sextavado zincado", NomeFornecedor:"ACME Peças", UnidadeMedida:"un", SaldoAtual:"480", DataAtualizacao:"2025-10-23T14:12:00Z" },
+  { Title:"Arruela Aço", CodigoFornecedor:"CF-67890", DescricaoProduto:"Arruela zincada 8mm",       NomeFornecedor:"ACME Peças", UnidadeMedida:"un", SaldoAtual:"650", DataAtualizacao:"2025-10-23T14:12:00Z" }
+];
+
+/* ========= ADAPTADORES DE DADOS (CSV -> campos esperados) ========= */
+// Mapeia campos por nome, tolerando variações de maiúsculas/minúsculas e espaços
+function mapFields(row){
+  const out={}; for(const k in row){ out[k.trim().toLowerCase()] = row[k]; } return out;
 }
 
-/* ========= CADASTRO (como estava) ========= */
-async function salvarProduto(){
-  const Title = document.getElementById('pTitle').value.trim();
-  if(!Title){ return statusMsg('Preencha o Título.', true); }
-  const obj = {
-    Title,
-    CodigoFornecedor: document.getElementById('pCodigoFornecedor').value.trim(),
-    DescricaoProduto: document.getElementById('pDescricao').value.trim(),
-    NomeFornecedor:   document.getElementById('pNomeFornecedor').value.trim(),
-    UnidadeMedida:    document.getElementById('pUnidade').value.trim(),
-    SaldoAtual:       Number(document.getElementById('pSaldoAtual').value || 0),
-    DataAtualizacao:  new Date().toISOString()
-  };
+/* ========= ENTRADAS ========= */
+let ENTRADAS_CACHE=[];
+async function carregarEntradas(){
   try{
-    statusMsg('Salvando...');
-    await spPost(LIST_PRODUTOS, obj);
-    statusMsg('✅ Produto salvo com sucesso!');
-    // limpa
-    ['pTitle','pCodigoFornecedor','pDescricao','pNomeFornecedor','pUnidade','pSaldoAtual'].forEach(id=>document.getElementById(id).value = id==='pSaldoAtual' ? 0 : '');
+    if(USE_MOCK){
+      ENTRADAS_CACHE = MOCK_ENTRADAS.slice();
+    }else{
+      const csv = await fetchCSV(CSV_URL_ENTRADAS);
+      const rows = parseCSV(csv);
+      ENTRADAS_CACHE = rows.map(r=>{
+        const m = mapFields(r);
+        return {
+          Title: m['title']||m['título']||m['titulo']||'',
+          Quantidade: m['quantidade']||'',
+          ValorUnitario: m['valorunitario']||m['valor_unitario']||m['valor unitario']||'',
+          ValorTotal: m['valortotal']||m['valor_total']||m['valor total']||'',
+          NotaFiscal: m['notafiscal']||m['nota_fiscal']||m['nota fiscal']||'',
+          Modified: m['modified']||m['data']||m['atualizacao']||m['atualização']||''
+        };
+      });
+    }
+    renderEntradas();
   }catch(e){
-    statusMsg('❌ Erro: '+e.message, true);
+    document.getElementById('infoEntradas').textContent = 'Erro ao carregar: '+e.message;
   }
 }
-function statusMsg(t, warn=false){ const el=document.getElementById('status'); el.textContent=t; el.classList.toggle('warn', !!warn); }
-
-/* ========= HISTÓRICO ========= */
-let ENTRADAS_CACHE=[], SAIDAS_CACHE=[];
-async function carregarEntradas(){
-  const data = await spGet(LIST_ENTRADAS, "Title,Quantidade,ValorUnitario,ValorTotal,NotaFiscal,Modified", "Modified desc", 2000);
-  ENTRADAS_CACHE = data;
-  renderEntradas();
-}
 function renderEntradas(){
-  const term = (document.getElementById('filterEntradas').value||'').toLowerCase().trim();
-  const tb = document.querySelector("#tableEntradas tbody"); tb.innerHTML="";
+  const term=(document.getElementById('filterEntradas').value||'').toLowerCase().trim();
+  const tb=document.querySelector("#tableEntradas tbody"); tb.innerHTML="";
+  let count=0, somaVT=0;
   ENTRADAS_CACHE
     .filter(x => !term || (x.Title||'').toLowerCase().includes(term) || (x.NotaFiscal||'').toLowerCase().includes(term))
     .forEach(i=>{
-      const q = Number(i.Quantidade)||0;
-      const vu = Number(i.ValorUnitario)||0;
-      const vt = (i.ValorTotal!==null && i.ValorTotal!==undefined && i.ValorTotal!=="") ? Number(i.ValorTotal) : (q*vu);
-      const tr = document.createElement('tr');
+      const q = num(i.Quantidade);
+      const vu = num(i.ValorUnitario);
+      const vt = i.ValorTotal!==null && i.ValorTotal!==undefined && i.ValorTotal!=="" ? num(i.ValorTotal) : (q*vu);
+      const tr=document.createElement('tr');
       tr.innerHTML = `
         <td>${i.Title||''}</td>
         <td>${q}</td>
@@ -238,22 +249,46 @@ function renderEntradas(){
         <td>${i.NotaFiscal||''}</td>
         <td>${toDateStr(i.Modified)}</td>`;
       tb.appendChild(tr);
+      count++; somaVT += vt;
     });
+  document.getElementById('infoEntradas').textContent = `Registros: ${count} | Soma ValorTotal: R$ ${fmtBR(somaVT)}`;
 }
 document.getElementById('filterEntradas').addEventListener('input', debounce(renderEntradas, 200));
 
+/* ========= SAÍDAS ========= */
+let SAIDAS_CACHE=[];
 async function carregarSaidas(){
-  const data = await spGet(LIST_SAIDAS, "Title,DescricaoProduto,Quantidade,PlacaCaminhao,Destinatario,Modified", "Modified desc", 2000);
-  SAIDAS_CACHE = data;
-  renderSaidas();
+  try{
+    if(USE_MOCK){
+      SAIDAS_CACHE = MOCK_SAIDAS.slice();
+    }else{
+      const csv = await fetchCSV(CSV_URL_SAIDAS);
+      const rows = parseCSV(csv);
+      SAIDAS_CACHE = rows.map(r=>{
+        const m = mapFields(r);
+        return {
+          Title: m['title']||m['título']||m['titulo']||'',
+          DescricaoProduto: m['descricaoproduto']||m['descricao_produto']||m['descrição do produto']||m['descriçãoproduto']||'',
+          Quantidade: m['quantidade']||'',
+          PlacaCaminhao: m['placacaminhao']||m['placa_caminhao']||m['placa do caminhao']||m['placa caminhão']||'',
+          Destinatario: m['destinatario']||m['destinatário']||'',
+          Modified: m['modified']||m['data']||m['atualizacao']||m['atualização']||''
+        };
+      });
+    }
+    renderSaidas();
+  }catch(e){
+    document.getElementById('infoSaidas').textContent = 'Erro ao carregar: '+e.message;
+  }
 }
 function renderSaidas(){
-  const term = (document.getElementById('filterSaidas').value||'').toLowerCase().trim();
-  const tb = document.querySelector("#tableSaidas tbody"); tb.innerHTML="";
+  const term=(document.getElementById('filterSaidas').value||'').toLowerCase().trim();
+  const tb=document.querySelector("#tableSaidas tbody"); tb.innerHTML="";
+  let count=0;
   SAIDAS_CACHE
     .filter(x => !term || (x.Title||'').toLowerCase().includes(term) || (x.Destinatario||'').toLowerCase().includes(term) || (x.PlacaCaminhao||'').toLowerCase().includes(term))
     .forEach(i=>{
-      const tr = document.createElement('tr');
+      const tr=document.createElement('tr');
       tr.innerHTML = `
         <td>${i.Title||''}</td>
         <td>${i.DescricaoProduto||''}</td>
@@ -262,24 +297,44 @@ function renderSaidas(){
         <td>${i.Destinatario||''}</td>
         <td>${toDateStr(i.Modified)}</td>`;
       tb.appendChild(tr);
+      count++;
     });
+  document.getElementById('infoSaidas').textContent = `Registros: ${count}`;
 }
 document.getElementById('filterSaidas').addEventListener('input', debounce(renderSaidas, 200));
 
-/* ========= SALDO (filtros tipo planilha + resumo) ========= */
+/* ========= SALDO ========= */
 let PRODUTOS_CACHE=[], PRODUTOS_FILTRADO=[];
 async function carregarProdutos(){
-  const data = await spGet(LIST_PRODUTOS, "Title,CodigoFornecedor,DescricaoProduto,NomeFornecedor,UnidadeMedida,SaldoAtual,DataAtualizacao,Modified", "Title asc", 5000);
-  PRODUTOS_CACHE = data;
-  aplicarFiltrosSaldo(); // render com filtros
+  try{
+    if(USE_MOCK){
+      PRODUTOS_CACHE = MOCK_PRODUTOS.slice();
+    }else{
+      const csv = await fetchCSV(CSV_URL_PRODUTOS);
+      const rows = parseCSV(csv);
+      PRODUTOS_CACHE = rows.map(r=>{
+        const m = mapFields(r);
+        return {
+          Title: m['title']||m['título']||m['titulo']||'',
+          CodigoFornecedor: m['codigofornecedor']||m['codigo_fornecedor']||m['código do fornecedor']||'',
+          DescricaoProduto: m['descricaoproduto']||m['descricao_produto']||'',
+          NomeFornecedor: m['nomefornecedor']||m['nome_fornecedor']||'',
+          UnidadeMedida: m['unidademedida']||m['unidade_medida']||'',
+          SaldoAtual: m['saldoatual']||m['saldo_atual']||'',
+          DataAtualizacao: m['dataatualizacao']||m['data_atualizacao']||m['atualizacao']||m['modified']||''
+        };
+      });
+    }
+    aplicarFiltrosSaldo();
+  }catch(e){
+    document.getElementById('saldoInfo').textContent = 'Erro ao carregar: '+e.message;
+  }
 }
 function aplicarFiltrosSaldo(){
-  // lê filtros
   const f = {};
   document.querySelectorAll('.filters-row input').forEach(inp=>f[inp.dataset.col]=inp.value.trim());
 
   PRODUTOS_FILTRADO = PRODUTOS_CACHE.filter(it=>{
-    // texto contém
     const like = (v,term)=> !term || (String(v||'').toLowerCase().includes(term.toLowerCase()));
     if(!like(it.Title, f.Title)) return false;
     if(!like(it.CodigoFornecedor, f.CodigoFornecedor)) return false;
@@ -287,13 +342,12 @@ function aplicarFiltrosSaldo(){
     if(!like(it.NomeFornecedor, f.NomeFornecedor)) return false;
     if(!like(it.UnidadeMedida, f.UnidadeMedida)) return false;
 
-    // número: suporta =, >, < (ex: >10)
     if(f.SaldoAtual){
-      const m = f.SaldoAtual.match(/^\s*([<>]=?|=)?\s*(-?\d+(?:\.\d+)?)\s*$/);
-      const val = Number(it.SaldoAtual||0);
+      const m = f.SaldoAtual.match(/^\s*([<>]=?|=)?\s*(-?\d+(?:[.,]\d+)?)\s*$/);
+      const val = num(it.SaldoAtual);
       if(m){
         const op = m[1]||'=';
-        const tgt = Number(m[2]);
+        const tgt = num(m[2]);
         if(op==='=' && !(val===tgt)) return false;
         if(op==='>' && !(val>tgt)) return false;
         if(op==='<' && !(val<tgt)) return false;
@@ -301,11 +355,9 @@ function aplicarFiltrosSaldo(){
         if(op==='<=' && !(val<=tgt)) return false;
       }
     }
-
-    // data (aaaa-mm-dd)
     if(f.DataAtualizacao){
-      const d = new Date(it.DataAtualizacao || it.Modified);
-      const ymd = d.toISOString().slice(0,10);
+      const d = new Date(it.DataAtualizacao);
+      const ymd = isNaN(d) ? '' : d.toISOString().slice(0,10);
       if(!ymd.startsWith(f.DataAtualizacao)) return false;
     }
     return true;
@@ -315,58 +367,49 @@ function aplicarFiltrosSaldo(){
   renderResumo(PRODUTOS_FILTRADO);
 }
 function renderSaldo(rows){
-  const tb = document.querySelector("#tableSaldo tbody"); tb.innerHTML="";
+  const tb=document.querySelector("#tableSaldo tbody"); tb.innerHTML="";
   rows.forEach(i=>{
-    const tr = document.createElement('tr');
+    const tr=document.createElement('tr');
     tr.innerHTML = `
       <td>${i.Title||''}</td>
       <td>${i.CodigoFornecedor||''}</td>
       <td>${i.DescricaoProduto||''}</td>
       <td>${i.NomeFornecedor||''}</td>
       <td>${i.UnidadeMedida||''}</td>
-      <td>${Number(i.SaldoAtual||0)}</td>
-      <td>${toDateStr(i.DataAtualizacao||i.Modified)}</td>`;
+      <td>${num(i.SaldoAtual)}</td>
+      <td>${toDateStr(i.DataAtualizacao)}</td>`;
     tb.appendChild(tr);
   });
   document.getElementById('saldoInfo').textContent =
-    `Itens: ${rows.length} | Saldo total: ${fmtBR(rows.reduce((s,x)=>s+Number(x.SaldoAtual||0),0),0)}`;
+    `Itens: ${rows.length} | Saldo total: ${fmtBR(rows.reduce((s,x)=>s+num(x.SaldoAtual),0),0)}`;
 }
 function renderResumo(rows){
-  // soma por Título
-  const map = new Map();
+  const map=new Map();
   rows.forEach(i=>{
-    const key = i.Title||'(sem título)';
-    const val = Number(i.SaldoAtual||0);
-    map.set(key, (map.get(key)||0)+val);
+    const key=i.Title||'(sem título)';
+    map.set(key,(map.get(key)||0)+num(i.SaldoAtual));
   });
-  const wrap = document.getElementById('resumoWrap'); wrap.innerHTML="";
-  [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).forEach(([title,total])=>{
-    const div = document.createElement('div');
-    div.className='card';
-    div.innerHTML = `<div><b>${title}</b></div><div class="muted">Saldo: <b>${fmtBR(total,0)}</b></div>`;
+  const wrap=document.getElementById('resumoWrap'); wrap.innerHTML="";
+  [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).forEach(([t,total])=>{
+    const div=document.createElement('div'); div.className='card';
+    div.innerHTML=`<div><b>${t}</b></div><div class="muted">Saldo: <b>${fmtBR(total,0)}</b></div>`;
     wrap.appendChild(div);
   });
 }
-// liga filtros
 document.querySelectorAll('.filters-row input').forEach(inp=>{
   inp.addEventListener('input', debounce(aplicarFiltrosSaldo, 180));
 });
-
 function exportarCSV(){
-  const table = document.getElementById('tableSaldo');
-  const rows = [...table.rows].map(tr=>[...tr.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
-  const blob = new Blob([rows.join('\n')],{type:'text/csv'});
+  const table=document.getElementById('tableSaldo');
+  const rows=[...table.rows].map(tr=>[...tr.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`saldo_${new Date().toISOString().slice(0,10)}.csv`; a.click();
 }
 
-/* ========= UTILS ========= */
-function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(null,a),ms)}}
-
 /* ========= INIT ========= */
 (function init(){
-  // abre cadastro por padrão
-  mostrar('produtos');
+  mostrar('home'); // começa na tela informativa
 })();
 </script>
 
