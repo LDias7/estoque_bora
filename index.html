@@ -5,44 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema de Estoque - BORA</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f3f6fb;
-  margin: 0;
-  padding: 0;
-  color: #333;
-}
-header {
-  background-color: #1f4e8c;
-  color: white;
-  padding: 15px;
-  text-align: center;
-}
-nav {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  background-color: #e2e8f0;
-  padding: 15px;
-}
-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #1f4e8c;
-  color: white;
-  cursor: pointer;
-  border-radius: 6px;
-  font-weight: bold;
-}
-button:hover { background-color: #2b6cb0; }
-section { display: none; padding: 20px; max-width: 1000px; margin: auto; background: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-section.active { display: block; }
-h2 { color: #1f4e8c; }
-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-th { background-color: #f0f0f0; }
-input { padding: 8px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
-#status { color: #1f4e8c; font-weight: bold; margin-top: 10px; }
+  body{font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;margin:0;color:#222}
+  header{background:#1f4e8c;color:#fff;padding:16px;text-align:center}
+  nav{display:flex;gap:12px;justify-content:center;background:#e6edf5;padding:12px;flex-wrap:wrap}
+  button{padding:10px 16px;border:0;border-radius:6px;background:#1f4e8c;color:#fff;font-weight:700;cursor:pointer}
+  button:hover{background:#2b6cb0}
+  section{display:none;max-width:1100px;margin:18px auto;background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  section.active{display:block}
+  h2{color:#1f4e8c;margin:0 0 12px}
+  label{display:block;margin-top:10px;font-weight:700}
+  input,select{width:100%;padding:8px;border:1px solid #cdd7e3;border-radius:6px;box-sizing:border-box}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .col-3{flex:1 1 300px}
+  table{width:100%;border-collapse:collapse;margin-top:14px}
+  th,td{border:1px solid #d9e2ef;padding:8px;text-align:left;font-size:14px}
+  th{background:#f2f6fc}
+  .muted{color:#667da0;font-size:13px}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  .pill{background:#eef4ff;color:#244c8a;border:1px solid #cfe0ff;border-radius:999px;padding:6px 10px;font-size:12px}
+  .right{margin-left:auto}
+  .filters-row input{width:100%;padding:6px;font-size:12px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .card{background:#f7f9fe;border:1px solid #e5ecf7;border-radius:8px;padding:10px}
+  .warn{color:#8a2424}
 </style>
 </head>
 <body>
@@ -51,169 +36,338 @@ input { padding: 8px; width: 100%; box-sizing: border-box; margin-bottom: 10px; 
 
 <nav>
   <button onclick="mostrar('produtos')">Cadastro de Produtos</button>
-  <button onclick="abrirForm('entrada')">Entrada</button>
-  <button onclick="abrirForm('saida')">Saída</button>
+  <button onclick="abrirForm('entrada')">Entrada (Form)</button>
+  <button onclick="abrirForm('saida')">Saída (Form)</button>
   <button onclick="mostrar('historico')">Histórico</button>
   <button onclick="mostrar('saldo')">Saldo</button>
 </nav>
 
-<!-- CADASTRO DE PRODUTOS -->
+<!-- CADASTRO DE PRODUTOS (como estava) -->
 <section id="produtos" class="active">
-  <h2>Cadastro de Produtos</h2>
-  <label>Título:</label><input id="pTitle">
-  <label>Código do Fornecedor:</label><input id="pCodigoFornecedor">
-  <label>Descrição do Produto:</label><input id="pDescricao">
-  <label>Nome do Fornecedor:</label><input id="pNomeFornecedor">
-  <label>Unidade de Medida:</label><input id="pUnidade">
-  <label>Saldo Atual:</label><input id="pSaldoAtual" type="number" value="0">
-  <button onclick="salvarProduto()">💾 Salvar Produto</button>
-  <p id="status"></p>
+  <h2>🧾 Cadastro de Produtos</h2>
+  <p class="muted">Lista: <b>Produtos</b> — Campos: Título, CodigoFornecedor, DescricaoProduto, NomeFornecedor, UnidadeMedida, SaldoAtual, DataAtualizacao (auto).</p>
+  <div class="row">
+    <div class="col-3"><label>Título (Nome do Produto)</label><input id="pTitle" placeholder="Parafuso M8 x 20mm"></div>
+    <div class="col-3"><label>Código do Fornecedor</label><input id="pCodigoFornecedor" placeholder="CF-12345"></div>
+    <div class="col-3"><label>Descrição do Produto</label><input id="pDescricao" placeholder="Parafuso zincado sextavado"></div>
+    <div class="col-3"><label>Nome do Fornecedor</label><input id="pNomeFornecedor" placeholder="ACME Peças"></div>
+    <div class="col-3"><label>Unidade de Medida</label><input id="pUnidade" placeholder="un, cx, kg, m"></div>
+    <div class="col-3"><label>Saldo Atual</label><input id="pSaldoAtual" type="number" step="1" min="0" value="0"></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button onclick="salvarProduto()">💾 Salvar Produto</button>
+    <span id="status" class="muted"></span>
+  </div>
 </section>
 
-<!-- HISTÓRICO -->
+<!-- HISTÓRICO ENTRADAS/SAÍDAS -->
 <section id="historico">
   <h2>📜 Histórico de Entradas e Saídas</h2>
 
-  <h3>Entradas</h3>
+  <div class="toolbar">
+    <span class="pill">Entradas</span>
+    <input id="filterEntradas" placeholder="Filtrar (título/nota fiscal)..." style="max-width:320px">
+    <button onclick="carregarEntradas()">Recarregar</button>
+  </div>
   <table id="tableEntradas">
     <thead>
-      <tr><th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th><th>Atualização</th></tr>
+      <tr>
+        <th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th><th>Atualização</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <h3>Saídas</h3>
+  <div class="toolbar" style="margin-top:18px">
+    <span class="pill">Saídas</span>
+    <input id="filterSaidas" placeholder="Filtrar (título/destinatário/placa)..." style="max-width:360px">
+    <button onclick="carregarSaidas()">Recarregar</button>
+  </div>
   <table id="tableSaidas">
     <thead>
-      <tr><th>Título</th><th>Descrição</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th><th>Atualização</th></tr>
+      <tr>
+        <th>Título</th><th>Descrição Produto</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th><th>Atualização</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
 </section>
 
-<!-- SALDO -->
+<!-- SALDO (com filtros tipo planilha e resumo por item) -->
 <section id="saldo">
-  <h2>📊 Saldo Atual de Produtos</h2>
-  <button onclick="exportarCSV()">⬇️ Exportar para CSV</button>
+  <h2>📊 Saldo de Produtos</h2>
+  <div class="toolbar">
+    <button onclick="carregarProdutos()">🔄 Recarregar</button>
+    <button onclick="exportarCSV()">⬇️ Exportar CSV</button>
+    <span class="right muted" id="saldoInfo">—</span>
+  </div>
   <table id="tableSaldo">
     <thead>
-      <tr><th>Título</th><th>Código Fornecedor</th><th>Descrição</th><th>Nome Fornecedor</th><th>Unidade</th><th>Saldo Atual</th><th>Data Atualização</th></tr>
+      <tr>
+        <th>Título</th>
+        <th>Código Fornecedor</th>
+        <th>Descrição Produto</th>
+        <th>Nome Fornecedor</th>
+        <th>Unidade</th>
+        <th>Saldo Atual</th>
+        <th>Data Atualização</th>
+      </tr>
+      <!-- Linha de filtros por coluna (estilo planilha) -->
+      <tr class="filters-row">
+        <th><input data-col="Title" placeholder="Filtrar título"></th>
+        <th><input data-col="CodigoFornecedor" placeholder="Filtrar cód. fornecedor"></th>
+        <th><input data-col="DescricaoProduto" placeholder="Filtrar descrição"></th>
+        <th><input data-col="NomeFornecedor" placeholder="Filtrar fornecedor"></th>
+        <th><input data-col="UnidadeMedida" placeholder="Filtrar unidade"></th>
+        <th><input data-col="SaldoAtual" placeholder="=, >, < (ex. >10)"></th>
+        <th><input data-col="DataAtualizacao" placeholder="aaaa-mm-dd"></th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
+
+  <h3 style="margin-top:18px">📈 Resumo por Item (soma do SaldoAtual por Título)</h3>
+  <div id="resumoWrap" class="cards"></div>
 </section>
 
 <script>
+/* ========= CONFIG ========= */
 const SITE = "https://borexpress.sharepoint.com/sites/EstoqueJC";
 const LIST_PRODUTOS = "Produtos";
 const LIST_ENTRADAS = "Entradas";
 const LIST_SAIDAS   = "Saidas";
-const FORM_ENTRADA = "COLE_AQUI_A_URL_DO_FORM_ENTRADA";
-const FORM_SAIDA   = "COLE_AQUI_A_URL_DO_FORM_SAIDA";
 
+// Forms fornecidos
+const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
+const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
+const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV"; // (não utilizado na UI, mas deixei aqui)
+
+/* ========= LAYOUT CLÁSSICO ========= */
 function mostrar(id){
-  document.querySelectorAll("section").forEach(sec=>sec.classList.remove("active"));
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   if(id==='historico'){carregarEntradas();carregarSaidas();}
   if(id==='saldo'){carregarProdutos();}
 }
 function abrirForm(tipo){
-  if(tipo==='entrada') window.open(FORM_ENTRADA,'_blank');
-  if(tipo==='saida') window.open(FORM_SAIDA,'_blank');
+  if(tipo==='entrada') window.open(FORM_ENTRADA,'_blank','noopener');
+  if(tipo==='saida')   window.open(FORM_SAIDA,'_blank','noopener');
 }
 
-// Helper
-async function spGet(list, select){
-  const r = await fetch(`${SITE}/_api/web/lists/GetByTitle('${list}')/items?$select=${select}&$top=5000`,{headers:{Accept:'application/json;odata=nometadata'}});
-  const j = await r.json();
-  return j.value || [];
+/* ========= HELPERS ========= */
+const fmtBR = (n,dec=2)=>Number(n).toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+function toDateStr(d){try{if(!d) return ""; const x=new Date(d); if(isNaN(x)) return ""; return x.toLocaleString('pt-BR')}catch{return ""}}
+
+async function spGet(list, select, orderby, top=5000){
+  const qs = [
+    `$select=${encodeURIComponent(select)}`,
+    orderby?`$orderby=${encodeURIComponent(orderby)}`:"",
+    `$top=${top}`
+  ].filter(Boolean).join("&");
+  const r = await fetch(`${SITE}/_api/web/lists/GetByTitle('${list}')/items?${qs}`, { headers:{Accept:'application/json;odata=nometadata'} });
+  if(!r.ok){ throw new Error(`GET ${list} ${r.status}`); }
+  const j = await r.json(); return j.value||[];
 }
 async function spDigest(){
-  const r = await fetch(`${SITE}/_api/contextinfo`,{method:'POST',headers:{Accept:'application/json;odata=nometadata'}});
-  const j = await r.json();
-  return j.FormDigestValue;
+  const r=await fetch(`${SITE}/_api/contextinfo`,{method:'POST',headers:{Accept:'application/json;odata=nometadata'}});
+  if(!r.ok) throw new Error('Digest falhou');
+  return (await r.json()).FormDigestValue;
 }
-async function spPost(list, data){
+async function spPost(list, obj){
   const digest = await spDigest();
-  const r = await fetch(`${SITE}/_api/web/lists/GetByTitle('${list}')/items`,{
+  const r = await fetch(`${SITE}/_api/web/lists/GetByTitle('${list}')/items`, {
     method:'POST',
     headers:{
       'Accept':'application/json;odata=nometadata',
       'Content-Type':'application/json;odata=nometadata',
       'X-RequestDigest':digest
     },
-    body:JSON.stringify(data)
+    body:JSON.stringify(obj)
   });
   if(!r.ok) throw new Error(await r.text());
   return r.json();
 }
 
-// CADASTRO PRODUTO
+/* ========= CADASTRO (como estava) ========= */
 async function salvarProduto(){
-  const obj={
-    Title:document.getElementById('pTitle').value.trim(),
-    CodigoFornecedor:document.getElementById('pCodigoFornecedor').value.trim(),
-    DescricaoProduto:document.getElementById('pDescricao').value.trim(),
-    NomeFornecedor:document.getElementById('pNomeFornecedor').value.trim(),
-    UnidadeMedida:document.getElementById('pUnidade').value.trim(),
-    SaldoAtual:Number(document.getElementById('pSaldoAtual').value||0),
-    DataAtualizacao:new Date().toISOString()
+  const Title = document.getElementById('pTitle').value.trim();
+  if(!Title){ return statusMsg('Preencha o Título.', true); }
+  const obj = {
+    Title,
+    CodigoFornecedor: document.getElementById('pCodigoFornecedor').value.trim(),
+    DescricaoProduto: document.getElementById('pDescricao').value.trim(),
+    NomeFornecedor:   document.getElementById('pNomeFornecedor').value.trim(),
+    UnidadeMedida:    document.getElementById('pUnidade').value.trim(),
+    SaldoAtual:       Number(document.getElementById('pSaldoAtual').value || 0),
+    DataAtualizacao:  new Date().toISOString()
   };
-  if(!obj.Title){document.getElementById('status').textContent="Preencha o título";return;}
-  document.getElementById('status').textContent="Salvando...";
   try{
-    await spPost(LIST_PRODUTOS,obj);
-    document.getElementById('status').textContent="✅ Produto salvo com sucesso!";
+    statusMsg('Salvando...');
+    await spPost(LIST_PRODUTOS, obj);
+    statusMsg('✅ Produto salvo com sucesso!');
+    // limpa
+    ['pTitle','pCodigoFornecedor','pDescricao','pNomeFornecedor','pUnidade','pSaldoAtual'].forEach(id=>document.getElementById(id).value = id==='pSaldoAtual' ? 0 : '');
   }catch(e){
-    document.getElementById('status').textContent="❌ Erro: "+e.message;
+    statusMsg('❌ Erro: '+e.message, true);
   }
 }
+function statusMsg(t, warn=false){ const el=document.getElementById('status'); el.textContent=t; el.classList.toggle('warn', !!warn); }
 
-// HISTÓRICO ENTRADAS
+/* ========= HISTÓRICO ========= */
+let ENTRADAS_CACHE=[], SAIDAS_CACHE=[];
 async function carregarEntradas(){
-  const t=document.querySelector("#tableEntradas tbody");
-  t.innerHTML="";
-  const data=await spGet(LIST_ENTRADAS,"Title,Quantidade,ValorUnitario,ValorTotal,NotaFiscal,Modified");
-  data.forEach(i=>{
-    const q=Number(i.Quantidade)||0;
-    const vu=Number(i.ValorUnitario)||0;
-    const vt=i.ValorTotal!==null?Number(i.ValorTotal):q*vu;
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i.Title||''}</td><td>${q}</td><td>R$ ${vu.toFixed(2)}</td><td>R$ ${vt.toFixed(2)}</td><td>${i.NotaFiscal||''}</td><td>${new Date(i.Modified).toLocaleString('pt-BR')}</td>`;
-    t.appendChild(tr);
+  const data = await spGet(LIST_ENTRADAS, "Title,Quantidade,ValorUnitario,ValorTotal,NotaFiscal,Modified", "Modified desc", 2000);
+  ENTRADAS_CACHE = data;
+  renderEntradas();
+}
+function renderEntradas(){
+  const term = (document.getElementById('filterEntradas').value||'').toLowerCase().trim();
+  const tb = document.querySelector("#tableEntradas tbody"); tb.innerHTML="";
+  ENTRADAS_CACHE
+    .filter(x => !term || (x.Title||'').toLowerCase().includes(term) || (x.NotaFiscal||'').toLowerCase().includes(term))
+    .forEach(i=>{
+      const q = Number(i.Quantidade)||0;
+      const vu = Number(i.ValorUnitario)||0;
+      const vt = (i.ValorTotal!==null && i.ValorTotal!==undefined && i.ValorTotal!=="") ? Number(i.ValorTotal) : (q*vu);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${i.Title||''}</td>
+        <td>${q}</td>
+        <td>R$ ${fmtBR(vu)}</td>
+        <td>R$ ${fmtBR(vt)}</td>
+        <td>${i.NotaFiscal||''}</td>
+        <td>${toDateStr(i.Modified)}</td>`;
+      tb.appendChild(tr);
+    });
+}
+document.getElementById('filterEntradas').addEventListener('input', debounce(renderEntradas, 200));
+
+async function carregarSaidas(){
+  const data = await spGet(LIST_SAIDAS, "Title,DescricaoProduto,Quantidade,PlacaCaminhao,Destinatario,Modified", "Modified desc", 2000);
+  SAIDAS_CACHE = data;
+  renderSaidas();
+}
+function renderSaidas(){
+  const term = (document.getElementById('filterSaidas').value||'').toLowerCase().trim();
+  const tb = document.querySelector("#tableSaidas tbody"); tb.innerHTML="";
+  SAIDAS_CACHE
+    .filter(x => !term || (x.Title||'').toLowerCase().includes(term) || (x.Destinatario||'').toLowerCase().includes(term) || (x.PlacaCaminhao||'').toLowerCase().includes(term))
+    .forEach(i=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${i.Title||''}</td>
+        <td>${i.DescricaoProduto||''}</td>
+        <td>${i.Quantidade||0}</td>
+        <td>${i.PlacaCaminhao||''}</td>
+        <td>${i.Destinatario||''}</td>
+        <td>${toDateStr(i.Modified)}</td>`;
+      tb.appendChild(tr);
+    });
+}
+document.getElementById('filterSaidas').addEventListener('input', debounce(renderSaidas, 200));
+
+/* ========= SALDO (filtros tipo planilha + resumo) ========= */
+let PRODUTOS_CACHE=[], PRODUTOS_FILTRADO=[];
+async function carregarProdutos(){
+  const data = await spGet(LIST_PRODUTOS, "Title,CodigoFornecedor,DescricaoProduto,NomeFornecedor,UnidadeMedida,SaldoAtual,DataAtualizacao,Modified", "Title asc", 5000);
+  PRODUTOS_CACHE = data;
+  aplicarFiltrosSaldo(); // render com filtros
+}
+function aplicarFiltrosSaldo(){
+  // lê filtros
+  const f = {};
+  document.querySelectorAll('.filters-row input').forEach(inp=>f[inp.dataset.col]=inp.value.trim());
+
+  PRODUTOS_FILTRADO = PRODUTOS_CACHE.filter(it=>{
+    // texto contém
+    const like = (v,term)=> !term || (String(v||'').toLowerCase().includes(term.toLowerCase()));
+    if(!like(it.Title, f.Title)) return false;
+    if(!like(it.CodigoFornecedor, f.CodigoFornecedor)) return false;
+    if(!like(it.DescricaoProduto, f.DescricaoProduto)) return false;
+    if(!like(it.NomeFornecedor, f.NomeFornecedor)) return false;
+    if(!like(it.UnidadeMedida, f.UnidadeMedida)) return false;
+
+    // número: suporta =, >, < (ex: >10)
+    if(f.SaldoAtual){
+      const m = f.SaldoAtual.match(/^\s*([<>]=?|=)?\s*(-?\d+(?:\.\d+)?)\s*$/);
+      const val = Number(it.SaldoAtual||0);
+      if(m){
+        const op = m[1]||'=';
+        const tgt = Number(m[2]);
+        if(op==='=' && !(val===tgt)) return false;
+        if(op==='>' && !(val>tgt)) return false;
+        if(op==='<' && !(val<tgt)) return false;
+        if(op==='>=' && !(val>=tgt)) return false;
+        if(op==='<=' && !(val<=tgt)) return false;
+      }
+    }
+
+    // data (aaaa-mm-dd)
+    if(f.DataAtualizacao){
+      const d = new Date(it.DataAtualizacao || it.Modified);
+      const ymd = d.toISOString().slice(0,10);
+      if(!ymd.startsWith(f.DataAtualizacao)) return false;
+    }
+    return true;
+  });
+
+  renderSaldo(PRODUTOS_FILTRADO);
+  renderResumo(PRODUTOS_FILTRADO);
+}
+function renderSaldo(rows){
+  const tb = document.querySelector("#tableSaldo tbody"); tb.innerHTML="";
+  rows.forEach(i=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i.Title||''}</td>
+      <td>${i.CodigoFornecedor||''}</td>
+      <td>${i.DescricaoProduto||''}</td>
+      <td>${i.NomeFornecedor||''}</td>
+      <td>${i.UnidadeMedida||''}</td>
+      <td>${Number(i.SaldoAtual||0)}</td>
+      <td>${toDateStr(i.DataAtualizacao||i.Modified)}</td>`;
+    tb.appendChild(tr);
+  });
+  document.getElementById('saldoInfo').textContent =
+    `Itens: ${rows.length} | Saldo total: ${fmtBR(rows.reduce((s,x)=>s+Number(x.SaldoAtual||0),0),0)}`;
+}
+function renderResumo(rows){
+  // soma por Título
+  const map = new Map();
+  rows.forEach(i=>{
+    const key = i.Title||'(sem título)';
+    const val = Number(i.SaldoAtual||0);
+    map.set(key, (map.get(key)||0)+val);
+  });
+  const wrap = document.getElementById('resumoWrap'); wrap.innerHTML="";
+  [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).forEach(([title,total])=>{
+    const div = document.createElement('div');
+    div.className='card';
+    div.innerHTML = `<div><b>${title}</b></div><div class="muted">Saldo: <b>${fmtBR(total,0)}</b></div>`;
+    wrap.appendChild(div);
   });
 }
-// HISTÓRICO SAIDAS
-async function carregarSaidas(){
-  const t=document.querySelector("#tableSaidas tbody");
-  t.innerHTML="";
-  const data=await spGet(LIST_SAIDAS,"Title,DescricaoProduto,Quantidade,PlacaCaminhao,Destinatario,Modified");
-  data.forEach(i=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i.Title||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.Quantidade||0}</td><td>${i.PlacaCaminhao||''}</td><td>${i.Destinatario||''}</td><td>${new Date(i.Modified).toLocaleString('pt-BR')}</td>`;
-    t.appendChild(tr);
-  });
+// liga filtros
+document.querySelectorAll('.filters-row input').forEach(inp=>{
+  inp.addEventListener('input', debounce(aplicarFiltrosSaldo, 180));
+});
+
+function exportarCSV(){
+  const table = document.getElementById('tableSaldo');
+  const rows = [...table.rows].map(tr=>[...tr.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
+  const blob = new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`saldo_${new Date().toISOString().slice(0,10)}.csv`; a.click();
 }
 
-// SALDO
-async function carregarProdutos(){
-  const t=document.querySelector("#tableSaldo tbody");
-  t.innerHTML="";
-  const data=await spGet(LIST_PRODUTOS,"Title,CodigoFornecedor,DescricaoProduto,NomeFornecedor,UnidadeMedida,SaldoAtual,DataAtualizacao,Modified");
-  data.forEach(i=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i.Title||''}</td><td>${i.CodigoFornecedor||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.NomeFornecedor||''}</td><td>${i.UnidadeMedida||''}</td><td>${i.SaldoAtual||0}</td><td>${new Date(i.DataAtualizacao||i.Modified).toLocaleString('pt-BR')}</td>`;
-    t.appendChild(tr);
-  });
-}
-function exportarCSV(){
-  const rows=[...document.querySelectorAll("#tableSaldo tr")].map(tr=>[...tr.cells].map(td=>`"${td.innerText}"`).join(","));
-  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=`saldo_${new Date().toISOString().split('T')[0]}.csv`;
-  a.click();
-}
+/* ========= UTILS ========= */
+function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(null,a),ms)}}
+
+/* ========= INIT ========= */
+(function init(){
+  // abre cadastro por padrão
+  mostrar('produtos');
+})();
 </script>
 
 </body>
