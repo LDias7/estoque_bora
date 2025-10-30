@@ -61,6 +61,10 @@
   .grid-buttons button:hover {
     background: var(--btnHover);
   }
+  .grid-buttons button:nth-child(1) {
+    grid-column: span 2;
+    justify-self: center;
+  }
 
   /* Páginas internas */
   .page {
@@ -124,8 +128,7 @@
     margin-top: 10px;
     font-size: 17px;
   }
-  th,
-  td {
+  th, td {
     border: 1px solid var(--border);
     padding: 10px;
     text-align: left;
@@ -153,8 +156,8 @@
     <button onclick="abrirForm('cadastro')">Cadastro</button>
     <button onclick="abrirForm('entrada')">Entrada</button>
     <button onclick="abrirForm('saida')">Saída</button>
-    <button onclick="mostrar('historico')">Histórico</button>
     <button onclick="mostrar('saldo')">Saldo</button>
+    <button onclick="mostrar('historico')">Histórico</button>
   </div>
 </section>
 
@@ -166,7 +169,7 @@
   </div>
 
   <div class="toolbar">
-    <label for="tipoHistorico"><b>Selecionar:</b></label>
+    <label><b>Selecionar:</b></label>
     <select id="tipoHistorico" onchange="mudarHistorico()">
       <option value="entrada">Entradas</option>
       <option value="saida">Saídas</option>
@@ -190,7 +193,9 @@
     <h2>Saldo de Produtos</h2>
   </div>
 
-  <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:var(--primary)">Total de produtos: 0 | Soma total de estoque: 0</div>
+  <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:var(--primary)">
+    Total de produtos: 0 | Soma total de estoque: 0
+  </div>
 
   <div class="toolbar">
     <button class="btn" onclick="carregarProdutos()">Recarregar</button>
@@ -217,9 +222,9 @@
 
 <script>
 /* === CONFIG === */
-const CSV_URL_ENTRADAS = "https://borexpress.sharepoint.com/:x:/s/EstoqueJC/EYdpGZ5KeV1PnpowpLI5mEMBjHMFwcjwvYCmTFWmFcqdqA?e=dZb8Db";
-const CSV_URL_SAIDAS   = "https://borexpress.sharepoint.com/:x:/s/EstoqueJC/EUj_pkX-AdBDnZwgibvUmnQBRVjVRzgzQm8PygwMJpXJpg?e=eMLMTa";
-const CSV_URL_PRODUTOS = "https://borexpress.sharepoint.com/:x:/s/EstoqueJC/EVD9DObRZR9KkNfSRGaQAtkBZs8BA2vudoJaSynZXEcHUQ?e=Uz6hdC";
+const CSV_URL_ENTRADAS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B031B11BD-94F0-498E-BFF6-D65D47D7B48E%7D&file=Entrada%20(1).csv&action=default&mobileredirect=true";
+const CSV_URL_SAIDAS   = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B2A31808A-8F08-4483-BCB8-1D91FD99306E%7D&file=Sa%C3%ADdas.csv&action=default&mobileredirect=true";
+const CSV_URL_PRODUTOS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B72EA510A-DBEB-456D-800D-7841FF573188%7D&file=Produtos.csv&action=default&mobileredirect=true";
 
 const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
@@ -274,8 +279,8 @@ function renderSaldo(rows){
   rows.forEach(i=>{const s=Number((i.SaldoAtual||'').replace(',','.'))||0;soma+=s;tb.innerHTML+=`<tr><td>${i.Title||''}</td><td>${i.CodigoFornecedor||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.NomeFornecedor||''}</td><td>${i.UnidadeMedida||''}</td><td>${fmtBR(s)}</td><td>${i.DataAtualizacao||''}</td></tr>`;});
   document.getElementById('saldoInfo').textContent=`Itens: ${rows.length}`;document.getElementById('resumoSaldo').textContent=`Total de produtos: ${rows.length} | Soma total de estoque: ${fmtBR(soma)}`;}
 function exportarCSV(){
-  const rows=[...document.querySelectorAll('#tableSaldo tr')].map(r=>[...r.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
-  const blob=new Blob([rows.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  const rows=[...document.querySelectorAll('#tableSaldo tr')].map(r=>[...r.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
 
 /* === INIT === */
