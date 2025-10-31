@@ -1,88 +1,181 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sistema Gestão de Estoque - BORA Transportes</title>
 <style>
+  :root {
+    --bg: #f4f7fb;
+    --text: #222;
+    --primary: #1f4e8c;
+    --panel: #fff;
+    --sub: #e6edf5;
+    --border: #d9e2ef;
+    --btn: #1f4e8c;
+    --btnHover: #2b6cb0;
+    --export: #0078d4;
+    --exportHover: #005a9e;
+    --muted: #555;
+  }
+  body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 22px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+  }
+
+  /* TELA INICIAL */
   #home {
-    min-height: calc(100vh - 100px);
+    min-height: calc(100vh - 80px);
+    display: grid;
+    place-items: center;
+    background: var(--sub);
+  }
+  .grid-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 18px;
+    width: min(680px, 90%);
+    margin: auto;
+    text-align: center;
+  }
+  .grid-buttons button {
+    padding: 18px 32px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--btn);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .grid-buttons button:hover {
+    background: var(--btnHover);
+  }
+  .cadastro-btn {
+    grid-column: span 2;
+    justify-self: center;
+  }
+
+  /* PÁGINAS INTERNAS */
+  .page {
+    display: none;
+    max-width: 1200px;
+    margin: 26px auto;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 26px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  }
+  .page.active {
+    display: block;
+  }
+  .topbar {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 25px;
+    gap: 10px;
+    margin-bottom: 14px;
   }
-  .home-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 220px);
-    gap: 20px 35px;
-    justify-content: center;
+  .topbar h2 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 28px;
   }
-  .home-grid button {
-    padding: 20px;
-    font-size: 20px;
-    border-radius: 12px;
-    background: #1f4e8c;
-    color: white;
-    font-weight: bold;
-    border: none;
+  .right {
+    margin-left: auto;
+  }
+
+  .btn {
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--btn);
+    color: #fff;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s;
+    font-size: 16px;
   }
-  .home-grid button:hover {
-    background: #2b6cb0;
+  .btn:hover {
+    background: var(--btnHover);
+  }
+  .btn-grey {
+    background: #888;
+  }
+  .btn-grey:hover {
+    background: #6f6f6f;
+  }
+  .btn-export {
+    background: var(--export);
+  }
+  .btn-export:hover {
+    background: var(--exportHover);
+  }
+
+  /* Tabelas */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 17px;
+  }
+  th,
+  td {
+    border: 1px solid var(--border);
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background: var(--sub);
+  }
+  .hint {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .page.active .only-pages {
+    display: inline-flex;
   }
 </style>
+</head>
+<body>
 
+<header>Sistema Gestão de Estoque</header>
+
+<!-- TELA INICIAL -->
 <section id="home">
-  <div class="home-grid">
-    <button onclick="abrirForm('cadastro')">Cadastro</button>
+  <div class="grid-buttons">
+    <button class="cadastro-btn" onclick="abrirForm('cadastro')">Cadastro</button>
     <button onclick="abrirForm('entrada')">Entrada</button>
     <button onclick="abrirForm('saida')">Saída</button>
     <button onclick="mostrar('saldo')">Saldo</button>
-    <button onclick="mostrar('historico')">Histórico</button>
   </div>
-</section>
-
-
-<!-- HISTÓRICO -->
-<section id="historico" class="page">
-  <div class="topbar">
-    <button class="btn btn-grey" onclick="mostrar('home')">Início</button>
-    <h2>Histórico</h2>
-  </div>
-
-  <div class="toolbar">
-    <label for="tipoHistorico"><b>Selecionar:</b></label>
-    <select id="tipoHistorico" onchange="mudarHistorico()">
-      <option value="entrada">Entradas</option>
-      <option value="saida">Saídas</option>
-    </select>
-    <button class="btn" onclick="recarregarHistorico()">Recarregar</button>
-    <input id="filtroHistorico" type="text" placeholder="Filtrar..." style="flex:1;max-width:360px">
-    <span id="infoHistorico" class="hint right">—</span>
-  </div>
-
-  <table id="tabelaHistorico">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
-  <div id="hintHistorico" class="hint" style="margin-top:8px;"></div>
 </section>
 
 <!-- SALDO -->
 <section id="saldo" class="page">
   <div class="topbar">
-    <button class="btn btn-grey" onclick="mostrar('home')">Início</button>
+    <button class="btn btn-grey only-pages" onclick="mostrar('home')">Início</button>
     <h2>Saldo de Produtos</h2>
   </div>
 
-  <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:#1f4e8c">Total de produtos: 0 | Soma total de estoque: 0</div>
+  <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:var(--primary)">
+    Total de produtos: 0 | Soma total de estoque: 0
+  </div>
 
   <div class="toolbar">
-    <button class="btn" onclick="carregarProdutos()">Recarregar</button>
-    <button class="btn" onclick="exportarCSV()">Exportar Planilha</button>
+    <button class="btn" onclick="carregarSaldo()">Recarregar</button>
+    <button class="btn btn-export" onclick="exportarCSV()">Exportar Planilha</button>
     <span id="saldoInfo" class="hint right">—</span>
   </div>
 
@@ -94,6 +187,8 @@
         <th>Descrição Produto</th>
         <th>Nome Fornecedor</th>
         <th>Unidade</th>
+        <th>Entradas</th>
+        <th>Saídas</th>
         <th>Saldo Atual</th>
         <th>Data Atualização</th>
       </tr>
@@ -105,21 +200,16 @@
 
 <script>
 /* === CONFIG === */
-const CSV_URL_ENTRADAS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B031B11BD-94F0-498E-BFF6-D65D47D7B48E%7D&file=Entrada%20(1).csv&action=default&mobileredirect=true";
-const CSV_URL_SAIDAS   = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B2A31808A-8F08-4483-BCB8-1D91FD99306E%7D&file=Sa%C3%ADdas.csv&action=default&mobileredirect=true";
-const CSV_URL_PRODUTOS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B72EA510A-DBEB-456D-800D-7841FF573188%7D&file=Produtos.csv&action=default&mobileredirect=true";
-
-const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
+const FORM_CAD = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
-const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
+const FORM_SAIDA = "https://forms.microsoft.com/r/n2Rr51aG6s";
 
 /* === NAVEGAÇÃO === */
 function mostrar(id){
-  document.getElementById('home').style.display = (id==='home') ? 'flex' : 'none';
+  document.getElementById('home').style.display = (id==='home') ? 'grid' : 'none';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   if(id!=='home') document.getElementById(id).classList.add('active');
-  if(id==='historico') mudarHistorico();
-  if(id==='saldo') carregarProdutos();
+  if(id==='saldo') carregarSaldo();
 }
 function abrirForm(tipo){
   if(tipo==='cadastro') window.open(FORM_CAD,'_blank');
@@ -127,48 +217,64 @@ function abrirForm(tipo){
   if(tipo==='saida')    window.open(FORM_SAIDA,'_blank');
 }
 
-/* === CSV FUNÇÕES === */
-async function fetchCSV(url){ const r=await fetch(url,{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); return await r.text();}
-function parseCSV(t){const l=t.replace(/\r/g,'').split('\n').filter(x=>x.trim());const h=l.shift().split(',');return l.map(v=>{const c=v.split(',');const o={};h.forEach((x,i)=>o[x]=c[i]);return o;});}
-const fmtBR=n=>Number(n).toLocaleString('pt-BR',{maximumFractionDigits:2});
-
-/* === HISTÓRICO === */
-let HIST_CACHE=[];
-async function mudarHistorico(){
-  const tipo=document.getElementById('tipoHistorico').value;
-  const th=document.querySelector('#tabelaHistorico thead');
-  th.innerHTML = tipo==='entrada'?
-  "<tr><th>Título</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th><th>Nota Fiscal</th><th>Atualização</th></tr>":
-  "<tr><th>Título</th><th>Descrição Produto</th><th>Quantidade</th><th>Placa Caminhão</th><th>Destinatário</th><th>Atualização</th></tr>";
-  const url = tipo==='entrada'?CSV_URL_ENTRADAS:CSV_URL_SAIDAS;
-  try{const csv=await fetchCSV(url);HIST_CACHE=parseCSV(csv);renderHistorico(tipo);}catch(e){document.getElementById('hintHistorico').textContent='Erro ao carregar CSV.';}
-}
-function renderHistorico(tipo){
-  const f=(document.getElementById('filtroHistorico').value||'').toLowerCase();const tb=document.querySelector('#tabelaHistorico tbody');tb.innerHTML='';
-  let c=0;HIST_CACHE.filter(r=>!f||Object.values(r).some(v=>String(v).toLowerCase().includes(f))).forEach(i=>{const tr=document.createElement('tr');
-  if(tipo==='entrada'){tr.innerHTML=`<td>${i.Title||''}</td><td>${i.Quantidade||''}</td><td>${i.ValorUnitario||''}</td><td>${i.ValorTotal||''}</td><td>${i.NotaFiscal||''}</td><td>${i.Modified||''}</td>`;}
-  else{tr.innerHTML=`<td>${i.Title||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.Quantidade||''}</td><td>${i.PlacaCaminhao||''}</td><td>${i.Destinatario||''}</td><td>${i.Modified||''}</td>`;}tb.appendChild(tr);c++;});
-  document.getElementById('infoHistorico').textContent=`Registros: ${c}`;}
-function recarregarHistorico(){mudarHistorico();}
-document.getElementById('filtroHistorico').addEventListener('input',()=>renderHistorico(document.getElementById('tipoHistorico').value));
-
 /* === SALDO === */
-let PROD_CACHE=[];
-async function carregarProdutos(){
-  try{const csv=await fetchCSV(CSV_URL_PRODUTOS);PROD_CACHE=parseCSV(csv);renderSaldo(PROD_CACHE);}catch(e){document.getElementById('hintSaldo').textContent='Erro ao carregar CSV.';}
+async function carregarSaldo(){
+  const base = location.origin;
+  const url = `${base}/api/estoque`;
+  const tb = document.querySelector("#tableSaldo tbody");
+  const info = document.getElementById("saldoInfo");
+  const resumo = document.getElementById("resumoSaldo");
+  const hint = document.getElementById("hintSaldo");
+
+  tb.innerHTML = "";
+  info.textContent = "Carregando...";
+  hint.textContent = "";
+
+  try{
+    const r = await fetch(url,{cache:'no-store'});
+    if(!r.ok) throw new Error("Erro ao consultar API");
+    const data = await r.json();
+    const rows = data.rows || [];
+    let soma=0;
+    rows.forEach(i=>{
+      const saldo = Number(i.SaldoAtual)||0;
+      soma += saldo;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i.Title||""}</td>
+        <td>${i.CodigoFornecedor||""}</td>
+        <td>${i.DescricaoProduto||""}</td>
+        <td>${i.NomeFornecedor||""}</td>
+        <td>${i.UnidadeMedida||""}</td>
+        <td>${i.Entradas||0}</td>
+        <td>${i.Saidas||0}</td>
+        <td>${saldo}</td>
+        <td>${i.DataAtualizacao||""}</td>
+      `;
+      tb.appendChild(tr);
+    });
+    resumo.textContent=`Total de produtos: ${rows.length} | Soma total de estoque: ${soma}`;
+    info.textContent=`Itens: ${rows.length}`;
+  }catch(e){
+    hint.textContent = "Erro: "+e.message;
+    info.textContent = "Erro ao carregar dados.";
+  }
 }
-function renderSaldo(rows){
-  const tb=document.querySelector('#tableSaldo tbody');tb.innerHTML='';let soma=0;
-  rows.forEach(i=>{const s=Number((i.SaldoAtual||'').replace(',','.'))||0;soma+=s;tb.innerHTML+=`<tr><td>${i.Title||''}</td><td>${i.CodigoFornecedor||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.NomeFornecedor||''}</td><td>${i.UnidadeMedida||''}</td><td>${fmtBR(s)}</td><td>${i.DataAtualizacao||''}</td></tr>`;});
-  document.getElementById('saldoInfo').textContent=`Itens: ${rows.length}`;document.getElementById('resumoSaldo').textContent=`Total de produtos: ${rows.length} | Soma total de estoque: ${fmtBR(soma)}`;}
+
+/* === EXPORTAR === */
 function exportarCSV(){
-  const rows=[...document.querySelectorAll('#tableSaldo tr')].map(r=>[...r.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
-  const blob=new Blob([rows.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  const rows=[...document.querySelectorAll("#tableSaldo tr")]
+    .map(r=>[...r.cells].map(td=>`"${(td.innerText||"").replace(/"/g,'""')}"`).join(","));
+  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`saldo_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
 
 /* === INIT === */
-mostrar('home');
+mostrar("home");
 </script>
+
 </body>
 </html>
-
