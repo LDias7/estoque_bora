@@ -1,151 +1,136 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sistema Gestão de Estoque - BORA Transportes</title>
 <style>
-  :root {
-    --bg: #f4f7fb;
-    --text: #222;
-    --primary: #1f4e8c;
-    --panel: #fff;
-    --sub: #e6edf5;
-    --border: #d9e2ef;
-    --btn: #1f4e8c;
-    --btnHover: #2b6cb0;
-    --export: #0078d4;
-    --exportHover: #005a9e;
-    --muted: #555;
-  }
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-  }
+:root {
+  --bg: #f4f7fb;
+  --text: #222;
+  --primary: #1f4e8c;
+  --panel: #fff;
+  --sub: #e6edf5;
+  --border: #d9e2ef;
+  --btn: #1f4e8c;
+  --btnHover: #2b6cb0;
+  --muted: #555;
+}
 
-  header {
-    background: var(--primary);
-    color: #fff;
-    padding: 22px;
-    text-align: center;
-    font-size: 26px;
-    font-weight: bold;
-  }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
 
-  /* TELA INICIAL */
-  #home {
-    min-height: calc(100vh - 80px);
-    display: grid;
-    place-items: center;
-    background: var(--sub);
-  }
-  .grid-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
-    gap: 18px;
-    width: min(680px, 90%);
-    margin: auto;
-    text-align: center;
-  }
-  .grid-buttons button {
-    padding: 18px 32px;
-    border: 0;
-    border-radius: 12px;
-    background: var(--btn);
-    color: #fff;
-    font-size: 22px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .grid-buttons button:hover {
-    background: var(--btnHover);
-  }
-  .cadastro-btn {
-    grid-column: span 2;
-    justify-self: center;
-  }
+header {
+  background: var(--primary);
+  color: #fff;
+  padding: 22px;
+  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+}
 
-  /* PÁGINAS INTERNAS */
-  .page {
-    display: none;
-    max-width: 1200px;
-    margin: 26px auto;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    padding: 26px;
-    border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-  }
-  .page.active {
-    display: block;
-  }
-  .topbar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .topbar h2 {
-    margin: 0;
-    color: var(--primary);
-    font-size: 28px;
-  }
-  .right {
-    margin-left: auto;
-  }
+/* Tela inicial */
+#home {
+  min-height: calc(100vh - 80px);
+  display: grid;
+  place-items: center;
+  background: var(--sub);
+}
 
-  .btn {
-    padding: 12px 18px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--btn);
-    color: #fff;
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  .btn:hover {
-    background: var(--btnHover);
-  }
-  .btn-grey {
-    background: #888;
-  }
-  .btn-grey:hover {
-    background: #6f6f6f;
-  }
-  .btn-export {
-    background: var(--export);
-  }
-  .btn-export:hover {
-    background: var(--exportHover);
-  }
+.grid-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 18px;
+  width: min(680px, 90%);
+  margin: auto;
+}
 
-  /* Tabelas */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 17px;
-  }
-  th,
-  td {
-    border: 1px solid var(--border);
-    padding: 10px;
-    text-align: left;
-  }
-  th {
-    background: var(--sub);
-  }
-  .hint {
-    color: var(--muted);
-    font-size: 14px;
-  }
+.grid-buttons button {
+  padding: 18px 32px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--btn);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.grid-buttons button:hover {
+  background: var(--btnHover);
+}
 
-  .page.active .only-pages {
-    display: inline-flex;
-  }
+/* Páginas internas */
+.page {
+  display: none;
+  max-width: 1200px;
+  margin: 26px auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 26px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+.page.active {
+  display: block;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.topbar h2 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 28px;
+}
+.right {
+  margin-left: auto;
+}
+
+.btn {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--btn);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 16px;
+}
+.btn:hover {
+  background: var(--btnHover);
+}
+.btn-grey {
+  background: #888;
+}
+.btn-grey:hover {
+  background: #6f6f6f;
+}
+
+/* Tabelas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 17px;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 10px;
+  text-align: left;
+}
+th {
+  background: var(--sub);
+}
+.hint {
+  color: var(--muted);
+  font-size: 14px;
+}
 </style>
 </head>
 <body>
@@ -155,7 +140,7 @@
 <!-- TELA INICIAL -->
 <section id="home">
   <div class="grid-buttons">
-    <button class="cadastro-btn" onclick="abrirForm('cadastro')">Cadastro</button>
+    <button onclick="abrirForm('cadastro')">Cadastro</button>
     <button onclick="abrirForm('entrada')">Entrada</button>
     <button onclick="abrirForm('saida')">Saída</button>
     <button onclick="mostrar('saldo')">Saldo</button>
@@ -174,8 +159,7 @@
   </div>
 
   <div class="toolbar">
-    <button class="btn" onclick="carregarSaldo()">Recarregar</button>
-    <button class="btn btn-export" onclick="exportarCSV()">Exportar Planilha</button>
+    <button class="btn" onclick="carregarProdutos()">Recarregar</button>
     <span id="saldoInfo" class="hint right">—</span>
   </div>
 
@@ -187,8 +171,6 @@
         <th>Descrição Produto</th>
         <th>Nome Fornecedor</th>
         <th>Unidade</th>
-        <th>Entradas</th>
-        <th>Saídas</th>
         <th>Saldo Atual</th>
         <th>Data Atualização</th>
       </tr>
@@ -200,80 +182,67 @@
 
 <script>
 /* === CONFIG === */
+const SITE_URL = "https://borexpress.sharepoint.com/sites/EstoqueJC";
+const LIST_PRODUTOS = "Produtos";
+
+/* === LINKS DOS FORMS === */
 const FORM_CAD = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
 const FORM_SAIDA = "https://forms.microsoft.com/r/n2Rr51aG6s";
 
-/* === NAVEGAÇÃO === */
+/* === FUNÇÕES DE NAVEGAÇÃO === */
 function mostrar(id){
   document.getElementById('home').style.display = (id==='home') ? 'grid' : 'none';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   if(id!=='home') document.getElementById(id).classList.add('active');
-  if(id==='saldo') carregarSaldo();
+  if(id==='saldo') carregarProdutos();
 }
+
 function abrirForm(tipo){
   if(tipo==='cadastro') window.open(FORM_CAD,'_blank');
   if(tipo==='entrada')  window.open(FORM_ENTRADA,'_blank');
   if(tipo==='saida')    window.open(FORM_SAIDA,'_blank');
 }
 
-/* === SALDO === */
-async function carregarSaldo(){
-  const base = location.origin;
-  const url = `${base}/api/estoque`;
-  const tb = document.querySelector("#tableSaldo tbody");
-  const info = document.getElementById("saldoInfo");
-  const resumo = document.getElementById("resumoSaldo");
-  const hint = document.getElementById("hintSaldo");
-
-  tb.innerHTML = "";
-  info.textContent = "Carregando...";
-  hint.textContent = "";
-
-  try{
-    const r = await fetch(url,{cache:'no-store'});
-    if(!r.ok) throw new Error("Erro ao consultar API");
-    const data = await r.json();
-    const rows = data.rows || [];
-    let soma=0;
-    rows.forEach(i=>{
-      const saldo = Number(i.SaldoAtual)||0;
-      soma += saldo;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${i.Title||""}</td>
-        <td>${i.CodigoFornecedor||""}</td>
-        <td>${i.DescricaoProduto||""}</td>
-        <td>${i.NomeFornecedor||""}</td>
-        <td>${i.UnidadeMedida||""}</td>
-        <td>${i.Entradas||0}</td>
-        <td>${i.Saidas||0}</td>
-        <td>${saldo}</td>
-        <td>${i.DataAtualizacao||""}</td>
-      `;
-      tb.appendChild(tr);
-    });
-    resumo.textContent=`Total de produtos: ${rows.length} | Soma total de estoque: ${soma}`;
-    info.textContent=`Itens: ${rows.length}`;
-  }catch(e){
-    hint.textContent = "Erro: "+e.message;
-    info.textContent = "Erro ao carregar dados.";
+/* === CONSULTA SHAREPOINT === */
+async function carregarProdutos(){
+  const endpoint = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_PRODUTOS}')/items?$orderby=Title asc`;
+  try {
+    const res = await fetch(endpoint, { headers: { Accept: "application/json;odata=verbose" }});
+    if(!res.ok) throw new Error("Falha ao carregar lista.");
+    const data = await res.json();
+    renderSaldo(data.d.results);
+  } catch(e) {
+    console.error(e);
+    document.getElementById('hintSaldo').textContent = "Erro ao carregar dados do SharePoint.";
   }
 }
 
-/* === EXPORTAR === */
-function exportarCSV(){
-  const rows=[...document.querySelectorAll("#tableSaldo tr")]
-    .map(r=>[...r.cells].map(td=>`"${(td.innerText||"").replace(/"/g,'""')}"`).join(","));
-  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=`saldo_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
+/* === RENDER === */
+function renderSaldo(rows){
+  const tb = document.querySelector('#tableSaldo tbody');
+  tb.innerHTML = '';
+  let soma = 0;
+  rows.forEach(item=>{
+    const s = Number(item.SaldoAtual)||0;
+    soma += s;
+    tb.innerHTML += `
+      <tr>
+        <td>${item.Title||''}</td>
+        <td>${item.CodigoFornecedor||''}</td>
+        <td>${item.DescricaoProduto||''}</td>
+        <td>${item.NomeFornecedor||''}</td>
+        <td>${item.UnidadeMedida||''}</td>
+        <td>${s.toLocaleString('pt-BR')}</td>
+        <td>${item.DataAtualizacao ? new Date(item.DataAtualizacao).toLocaleString('pt-BR') : ''}</td>
+      </tr>`;
+  });
+  document.getElementById('resumoSaldo').textContent = 
+    `Total de produtos: ${rows.length} | Soma total de estoque: ${soma.toLocaleString('pt-BR')}`;
+  document.getElementById('saldoInfo').textContent = `Itens: ${rows.length}`;
 }
 
-/* === INIT === */
-mostrar("home");
+mostrar('home');
 </script>
 
 </body>
