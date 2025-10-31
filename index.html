@@ -5,28 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sistema Gestão de Estoque - BORA Transportes</title>
 <style>
-  :root {
-    --bg: #f4f7fb;
-    --text: #222;
-    --primary: #1f4e8c;
-    --panel: #fff;
-    --sub: #e6edf5;
-    --border: #d9e2ef;
-    --btn: #1f4e8c;
-    --btnHover: #2b6cb0;
-    --export: #0078d4;
-    --exportHover: #005a9e;
-    --muted: #555;
-  }
   body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    background: #f4f7fb;
+    color: #222;
   }
 
   header {
-    background: var(--primary);
+    background: #1f4e8c;
     color: #fff;
     padding: 22px;
     text-align: center;
@@ -37,33 +24,29 @@
   /* Tela inicial */
   #home {
     min-height: calc(100vh - 80px);
-    display: grid;
-    place-items: center;
-    background: var(--sub);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 22px;
   }
-  .grid-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
-    gap: 18px;
-    width: min(680px, 90%);
-    margin: auto;
+  .row {
+    display: flex;
+    gap: 22px;
   }
-  .grid-buttons button {
+  button {
     padding: 18px 32px;
-    border: 0;
+    border: none;
     border-radius: 12px;
-    background: var(--btn);
-    color: #fff;
+    background: #1f4e8c;
+    color: white;
     font-size: 22px;
-    font-weight: 700;
+    font-weight: bold;
     cursor: pointer;
+    transition: background 0.2s;
   }
-  .grid-buttons button:hover {
-    background: var(--btnHover);
-  }
-  .grid-buttons button:nth-child(1) {
-    grid-column: span 2;
-    justify-self: center;
+  button:hover {
+    background: #2b6cb0;
   }
 
   /* Páginas internas */
@@ -71,11 +54,11 @@
     display: none;
     max-width: 1200px;
     margin: 26px auto;
-    background: var(--panel);
-    border: 1px solid var(--border);
+    background: #fff;
+    border: 1px solid #d9e2ef;
     padding: 26px;
     border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
   }
   .page.active {
     display: block;
@@ -88,40 +71,22 @@
   }
   .topbar h2 {
     margin: 0;
-    color: var(--primary);
+    color: #1f4e8c;
     font-size: 28px;
   }
-  .right {
-    margin-left: auto;
-  }
-
   .btn {
-    padding: 12px 18px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--btn);
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #1f4e8c;
     color: #fff;
     font-weight: 700;
     cursor: pointer;
-    font-size: 16px;
   }
-  .btn:hover {
-    background: var(--btnHover);
-  }
-  .btn-grey {
-    background: #888;
-  }
-  .btn-grey:hover {
-    background: #6f6f6f;
-  }
-  .btn-export {
-    background: var(--export);
-  }
-  .btn-export:hover {
-    background: var(--exportHover);
-  }
+  .btn:hover { background: #2b6cb0; }
+  .btn-grey { background: #777; }
+  .btn-grey:hover { background: #5f5f5f; }
 
-  /* Tabelas */
   table {
     width: 100%;
     border-collapse: collapse;
@@ -129,20 +94,16 @@
     font-size: 17px;
   }
   th, td {
-    border: 1px solid var(--border);
+    border: 1px solid #d9e2ef;
     padding: 10px;
     text-align: left;
   }
   th {
-    background: var(--sub);
+    background: #e6edf5;
   }
   .hint {
-    color: var(--muted);
-    font-size: 14px;
-  }
-
-  .page.active .only-pages {
-    display: inline-flex;
+    color: #555;
+    font-size: 15px;
   }
 </style>
 </head>
@@ -152,10 +113,14 @@
 
 <!-- TELA INICIAL -->
 <section id="home">
-  <div class="grid-buttons">
+  <div class="row">
     <button onclick="abrirForm('cadastro')">Cadastro</button>
+  </div>
+  <div class="row">
     <button onclick="abrirForm('entrada')">Entrada</button>
     <button onclick="abrirForm('saida')">Saída</button>
+  </div>
+  <div class="row">
     <button onclick="mostrar('saldo')">Saldo</button>
     <button onclick="mostrar('historico')">Histórico</button>
   </div>
@@ -164,12 +129,12 @@
 <!-- HISTÓRICO -->
 <section id="historico" class="page">
   <div class="topbar">
-    <button class="btn btn-grey only-pages" onclick="mostrar('home')">Início</button>
+    <button class="btn btn-grey" onclick="mostrar('home')">Início</button>
     <h2>Histórico</h2>
   </div>
 
   <div class="toolbar">
-    <label><b>Selecionar:</b></label>
+    <label for="tipoHistorico"><b>Selecionar:</b></label>
     <select id="tipoHistorico" onchange="mudarHistorico()">
       <option value="entrada">Entradas</option>
       <option value="saida">Saídas</option>
@@ -189,17 +154,15 @@
 <!-- SALDO -->
 <section id="saldo" class="page">
   <div class="topbar">
-    <button class="btn btn-grey only-pages" onclick="mostrar('home')">Início</button>
+    <button class="btn btn-grey" onclick="mostrar('home')">Início</button>
     <h2>Saldo de Produtos</h2>
   </div>
 
-  <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:var(--primary)">
-    Total de produtos: 0 | Soma total de estoque: 0
-  </div>
+  <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:#1f4e8c">Total de produtos: 0 | Soma total de estoque: 0</div>
 
   <div class="toolbar">
     <button class="btn" onclick="carregarProdutos()">Recarregar</button>
-    <button class="btn btn-export" onclick="exportarCSV()">Exportar Planilha</button>
+    <button class="btn" onclick="exportarCSV()">Exportar Planilha</button>
     <span id="saldoInfo" class="hint right">—</span>
   </div>
 
@@ -222,9 +185,9 @@
 
 <script>
 /* === CONFIG === */
-const CSV_URL_ENTRADAS = "https://borexpress.sharepoint.com/sites/EstoqueJC/_layouts/15/download.aspx?UniqueId=%7B031B11BD-94F0-498E-BFF6-D65D47D7B48E%7D";
-const CSV_URL_SAIDAS   = "https://borexpress.sharepoint.com/sites/EstoqueJC/_layouts/15/download.aspx?UniqueId=%7B2A31808A-8F08-4483-BCB8-1D91FD99306E%7D";
-const CSV_URL_PRODUTOS = "https://borexpress.sharepoint.com/sites/EstoqueJC/_layouts/15/download.aspx?UniqueId=%7B72EA510A-DBEB-456D-800D-7841FF573188%7D";
+const CSV_URL_ENTRADAS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B031B11BD-94F0-498E-BFF6-D65D47D7B48E%7D&file=Entrada%20(1).csv&action=default&mobileredirect=true";
+const CSV_URL_SAIDAS   = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B2A31808A-8F08-4483-BCB8-1D91FD99306E%7D&file=Sa%C3%ADdas.csv&action=default&mobileredirect=true";
+const CSV_URL_PRODUTOS = "https://borexpress.sharepoint.com/:x:/r/sites/EstoqueJC/_layouts/15/Doc.aspx?sourcedoc=%7B72EA510A-DBEB-456D-800D-7841FF573188%7D&file=Produtos.csv&action=default&mobileredirect=true";
 
 const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
@@ -232,7 +195,7 @@ const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
 
 /* === NAVEGAÇÃO === */
 function mostrar(id){
-  document.getElementById('home').style.display = (id==='home') ? 'grid' : 'none';
+  document.getElementById('home').style.display = (id==='home') ? 'flex' : 'none';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   if(id!=='home') document.getElementById(id).classList.add('active');
   if(id==='historico') mudarHistorico();
@@ -279,8 +242,8 @@ function renderSaldo(rows){
   rows.forEach(i=>{const s=Number((i.SaldoAtual||'').replace(',','.'))||0;soma+=s;tb.innerHTML+=`<tr><td>${i.Title||''}</td><td>${i.CodigoFornecedor||''}</td><td>${i.DescricaoProduto||''}</td><td>${i.NomeFornecedor||''}</td><td>${i.UnidadeMedida||''}</td><td>${fmtBR(s)}</td><td>${i.DataAtualizacao||''}</td></tr>`;});
   document.getElementById('saldoInfo').textContent=`Itens: ${rows.length}`;document.getElementById('resumoSaldo').textContent=`Total de produtos: ${rows.length} | Soma total de estoque: ${fmtBR(soma)}`;}
 function exportarCSV(){
-  const rows=[...document.querySelectorAll('#tableSaldo tr')].map(r=>[...r.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));const blob=new Blob([rows.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  const rows=[...document.querySelectorAll('#tableSaldo tr')].map(r=>[...r.cells].map(td=>`"${(td.innerText||'').replace(/"/g,'""')}"`).join(','));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`produtos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
 
 /* === INIT === */
@@ -288,4 +251,3 @@ mostrar('home');
 </script>
 </body>
 </html>
-
