@@ -1,42 +1,59 @@
-async function getToken() {
-  const r = await fetch(`${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : ''}/api/token`);
-  if (!r.ok) throw new Error('token fail');
-  const { access_token } = await r.json();
-  return access_token;
-}
-
-async function graphGetAll(url, token) {
-  const out = [];
-  let next = `https://graph.microsoft.com/v1.0${url}`;
-  while (next) {
-    const r = await fetch(next, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await r.json();
-    if (!r.ok) throw new Error(JSON.stringify(data));
-    out.push(...(data.value || []));
-    next = data['@odata.nextLink'] || null;
-  }
-  return out;
-}
-
 export default async function handler(req, res) {
   try {
-    const SITE_ID = process.env.SITE_ID;
-    const LIST_PRODUTOS = process.env.LIST_PRODUTOS || 'Produtos';
-    const LIST_ENTRADAS = process.env.LIST_ENTRADAS || 'Entrada';
-    const LIST_SAIDAS = process.env.LIST_SAIDAS || 'Saídas';
+    const {
+      TENANT_ID,
+      CLIENT_ID,
+      CLIENT_SECRET,
+      SITE_ID,
+      LIST_PRODUTOS = 'Produtos',
+      LIST_ENTRADAS = 'Entrada',
+      LIST_SAIDAS   = 'Saídas',
+    } = process.env;
 
-    if (!SITE_ID) return res.status(500).json({ error: 'SITE_ID missing' });
+    if (!TENANT_ID || !CLIENT_ID || !CLIENT_SECRET || !SITE_ID) {
+      return res.status(500).json({ error: 'Missing env vars (TENANT_ID, CLIENT_ID, CLIENT_SECRET, SITE_ID)' });
+    }
 
-    const token = await getToken();
+    // 1) Token
+    const tokenResp = await fetch(`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        scope: 'https://graph.microsoft.com/.default',
+        grant_type: 'client_credentials',
+      }),
+    });
+    const tokenData = await tokenResp.json();
+    if (!tokenResp.ok || !tokenData.access_token) {
+      return res.status(tokenResp.status || 500).json({ error: 'token_error', details: tokenData });
+    }
+    const token = tokenData.access_token;
 
-    // Lê listas (campos via fields.*)
+    // 2) Utilitário: paginação Graph
+    async function graphGetAll(urlPath) {
+      const out = [];
+      let next = `https://graph.microsoft.com/v1.0${urlPath}`;
+      while (next) {
+        const r = await fetch(next, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await r.json();
+        if (!r.ok) throw new Error(JSON.stringify(data));
+        out.push(...(data.value || []));
+        next = data['@odata.nextLink'] || null;
+      }
+      return out;
+    }
+
+    // 3) Busca listas
+    const encSite = encodeURIComponent(SITE_ID);
     const [prod, ent, sai] = await Promise.all([
-      graphGetAll(`/sites/${encodeURIComponent(SITE_ID)}/lists/${encodeURIComponent(LIST_PRODUTOS)}/items?expand=fields&$top=5000`, token),
-      graphGetAll(`/sites/${encodeURIComponent(SITE_ID)}/lists/${encodeURIComponent(LIST_ENTRADAS)}/items?expand=fields&$top=5000`, token),
-      graphGetAll(`/sites/${encodeURIComponent(SITE_ID)}/lists/${encodeURIComponent(LIST_SAIDAS)}/items?expand=fields&$top=5000`, token),
+      graphGetAll(`/sites/${encSite}/lists/${encodeURIComponent(LIST_PRODUTOS)}/items?expand=fields&$top=5000`),
+      graphGetAll(`/sites/${encSite}/lists/${encodeURIComponent(LIST_ENTRADAS)}/items?expand=fields&$top=5000`),
+      graphGetAll(`/sites/${encSite}/lists/${encodeURIComponent(LIST_SAIDAS)}/items?expand=fields&$top=5000`),
     ]);
 
-    // Normaliza números (aceita vírgula ou ponto)
+    // 4) Normaliza números
     const toNum = (v) => {
       if (v === null || v === undefined) return 0;
       const s = String(v).replace(/\./g, '').replace(',', '.');
@@ -44,30 +61,28 @@ export default async function handler(req, res) {
       return Number.isFinite(n) ? n : 0;
     };
 
-    // Soma entradas/saídas por Title
-    const sumByTitle = (rows, fieldQty = 'Quantidade') => {
+    // 5) Soma entradas/saídas por Title
+    const sumByTitle = (rows, qtyField = 'Quantidade') => {
       const map = new Map();
       for (const it of rows) {
         const f = it.fields || {};
         const key = (f.Title || '').trim();
         if (!key) continue;
-        const q = toNum(f[fieldQty]);
+        const q = toNum(f[qtyField]);
         map.set(key, (map.get(key) || 0) + q);
       }
       return map;
     };
-
     const entMap = sumByTitle(ent);
     const saiMap = sumByTitle(sai);
 
-    // Junta com Produtos e calcula saldo (Entradas - Saídas)
+    // 6) Consolida com Produtos
     const rows = (prod || []).map((it) => {
       const f = it.fields || {};
       const title = (f.Title || '').trim();
       const entradas = entMap.get(title) || 0;
-      const saidas = saiMap.get(title) || 0;
-      const saldo = entradas - saidas;
-
+      const saidas   = saiMap.get(title) || 0;
+      const saldo    = entradas - saidas;
       return {
         Title: title,
         CodigoFornecedor: f.CodigoFornecedor || '',
@@ -81,31 +96,24 @@ export default async function handler(req, res) {
       };
     });
 
-    // Caso existam entradas/saídas de itens não cadastrados em Produtos, inclui também
-    const ensureKey = new Set(rows.map(r => r.Title));
+    // Itens sem cadastro em Produtos mas presentes em entradas/saídas
+    const have = new Set(rows.map(r => r.Title));
     for (const [title, entradas] of entMap.entries()) {
-      if (!ensureKey.has(title)) {
+      if (!have.has(title)) {
         const saidas = saiMap.get(title) || 0;
         rows.push({
-          Title: title,
-          CodigoFornecedor: '',
-          DescricaoProduto: '',
-          NomeFornecedor: '',
-          UnidadeMedida: '',
-          Entradas: entradas,
-          Saidas: saidas,
-          SaldoAtual: entradas - saidas,
-          DataAtualizacao: '',
+          Title: title, CodigoFornecedor:'', DescricaoProduto:'', NomeFornecedor:'', UnidadeMedida:'',
+          Entradas: entradas, Saidas: saidas, SaldoAtual: entradas - saidas, DataAtualizacao: ''
         });
       }
     }
 
-    // Ordena por título
-    rows.sort((a, b) => a.Title.localeCompare(b.Title, 'pt-BR'));
+    rows.sort((a,b)=>a.Title.localeCompare(b.Title,'pt-BR'));
 
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json({ rows });
   } catch (e) {
-    return res.status(500).json({ error: String(e) });
+    // Sempre devolva JSON (nunca HTML)
+    return res.status(500).json({ error: 'server_error', details: String(e) });
   }
 }
