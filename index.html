@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sistema Gestão de Estoque - BORA Transportes</title>
 <style>
 :root {
@@ -33,7 +33,6 @@ header {
   font-weight: bold;
 }
 
-/* Tela inicial */
 #home {
   min-height: calc(100vh - 80px);
   display: grid;
@@ -63,7 +62,6 @@ header {
   background: var(--btnHover);
 }
 
-/* Páginas internas */
 .page {
   display: none;
   max-width: 1200px;
@@ -112,7 +110,6 @@ header {
   background: #6f6f6f;
 }
 
-/* Tabelas */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -137,7 +134,6 @@ th {
 
 <header>Sistema Gestão de Estoque</header>
 
-<!-- TELA INICIAL -->
 <section id="home">
   <div class="grid-buttons">
     <button onclick="abrirForm('cadastro')">Cadastro</button>
@@ -147,10 +143,9 @@ th {
   </div>
 </section>
 
-<!-- SALDO -->
 <section id="saldo" class="page">
   <div class="topbar">
-    <button class="btn btn-grey only-pages" onclick="mostrar('home')">Início</button>
+    <button class="btn btn-grey" onclick="mostrar('home')">Início</button>
     <h2>Saldo de Produtos</h2>
   </div>
 
@@ -166,161 +161,93 @@ th {
   <table id="tableSaldo">
     <thead>
       <tr>
-        <th>Título</th>
+        <th>Produto</th>
         <th>Código Fornecedor</th>
-        <th>Descrição Produto</th>
-        <th>Nome Fornecedor</th>
+        <th>Descrição</th>
+        <th>Fornecedor</th>
         <th>Unidade</th>
         <th>Saldo Atual</th>
-        <th>Data Atualização</th>
+        <th>Última Atualização</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
+
   <div id="hintSaldo" class="hint" style="margin-top:8px;"></div>
 </section>
 
 <script>
-/* === CONFIG MICROSOFT GRAPH === */
-const tenantId = "c4ed6b57-ee20-4018-856c-906c42016848";
-const clientId = "35fd30ca-1f53-4b1f-9e39-6610ee04a103";
-const sitePath = "borexpress.sharepoint.com,sites,EstoqueJC"; // formato exigido pelo Graph
-let accessToken = "";
+/* === CONFIG SHAREPOINT === */
+const SITE_URL = "https://borexpress.sharepoint.com/sites/EstoqueJC";
+const LIST_PRODUTOS = "Produtos";
 
 /* === LINKS DOS FORMS === */
 const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
 const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
 
-/* === FUNÇÕES DE LOGIN === */
-function getAccessTokenFromUrl() {
-  const hash = window.location.hash;
-  const match = hash.match(/access_token=([^&]+)/);
-  if (match) {
-    accessToken = match[1];
-    console.log("Token obtido com sucesso!");
-    window.history.replaceState({}, document.title, window.location.pathname); // limpa o hash da URL
-  }
+/* === FUNÇÕES DE NAVEGAÇÃO === */
+function mostrar(id) {
+  document.getElementById("home").style.display = id === "home" ? "grid" : "none";
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  if (id !== "home") document.getElementById(id).classList.add("active");
+  if (id === "saldo") carregarProdutos();
 }
 
-async function loginMicrosoft() {
-  const redirectUri = window.location.origin; // Vercel ou localhost
-  const authUrl =
-    `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize` +
-    `?client_id=${clientId}` +
-    `&response_type=token` +
-    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-    `&scope=https://graph.microsoft.com/Sites.Read.All` +
-    `&response_mode=fragment`;
-  window.location.href = authUrl;
+function abrirForm(tipo) {
+  if (tipo === "cadastro") window.open(FORM_CAD, "_blank");
+  if (tipo === "entrada")  window.open(FORM_ENTRADA, "_blank");
+  if (tipo === "saida")    window.open(FORM_SAIDA, "_blank");
 }
 
-/* === NAVEGAÇÃO === */
-function mostrar(id){
-  document.getElementById('home').style.display = (id==='home') ? 'grid' : 'none';
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  if(id!=='home') document.getElementById(id).classList.add('active');
-  if(id==='saldo') carregarProdutos();
-}
-
-function abrirForm(tipo){
-  if(tipo==='cadastro') window.open(FORM_CAD,'_blank');
-  if(tipo==='entrada')  window.open(FORM_ENTRADA,'_blank');
-  if(tipo==='saida')    window.open(FORM_SAIDA,'_blank');
-}
-
-/* === BUSCA MICROSOFT GRAPH === */
-async function graphGetListItems(listName) {
-  if (!accessToken) getAccessTokenFromUrl();
-  if (!accessToken) {
-    alert("Você precisa fazer login com sua conta Microsoft para continuar.");
-    return loginMicrosoft();
-  }
-
-  const endpoint = `https://graph.microsoft.com/v1.0/sites/${sitePath}/lists/${listName}/items?expand=fields&$top=5000`;
-  const res = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${accessToken}` }
-  });
-
-  if (!res.ok) throw new Error("Falha ao acessar lista " + listName);
-  const data = await res.json();
-  return data.value || [];
-}
-
-/* === CÁLCULO DE SALDO === */
-async function getSaldoProduto(nomeProduto) {
-  const entradas = await graphGetListItems("Entrada");
-  const saidas   = await graphGetListItems("Saída");
-
-  const totalEntradas = entradas
-    .filter(i => i.fields.Produto === nomeProduto)
-    .reduce((s, i) => s + (Number(i.fields.Quantidade) || 0), 0);
-
-  const totalSaidas = saidas
-    .filter(i => i.fields.Produto === nomeProduto)
-    .reduce((s, i) => s + (Number(i.fields.Quantidade) || 0), 0);
-
-  return totalEntradas - totalSaidas;
-}
-
-/* === CARREGAR PRODUTOS === */
-async function carregarProdutos(){
+/* === BUSCAR DADOS DO SHAREPOINT === */
+async function carregarProdutos() {
+  const endpoint = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_PRODUTOS}')/items?$orderby=Title asc`;
   try {
-    document.getElementById('hintSaldo').textContent = "Carregando produtos...";
-    const produtos = await graphGetListItems("Produtos");
-    await renderSaldo(produtos);
-  } catch(e) {
+    document.getElementById("hintSaldo").textContent = "Carregando produtos...";
+    const res = await fetch(endpoint, { headers: { Accept: "application/json;odata=verbose" } });
+    if (!res.ok) throw new Error("Falha ao carregar lista de produtos.");
+    const data = await res.json();
+    renderSaldo(data.d.results);
+  } catch (e) {
     console.error(e);
-    document.getElementById('hintSaldo').textContent = "Erro ao carregar dados: " + e.message;
+    document.getElementById("hintSaldo").textContent = "Erro ao carregar dados: " + e.message;
   }
 }
 
-/* === RENDERIZAÇÃO === */
-async function renderSaldo(rows){
-  const tb = document.querySelector('#tableSaldo tbody');
-  tb.innerHTML = '';
-  document.getElementById('hintSaldo').textContent = "Calculando saldos...";
-
+/* === RENDERIZAR TABELA DE SALDO === */
+function renderSaldo(rows) {
+  const tb = document.querySelector("#tableSaldo tbody");
+  tb.innerHTML = "";
   let soma = 0;
   let count = 0;
 
-  for (const item of rows) {
-    const nomeProduto = item.fields.Title || "";
-    const saldoCalculado = await getSaldoProduto(nomeProduto);
-    soma += saldoCalculado;
+  rows.forEach(item => {
+    const saldo = Number(item.SaldoAtual) || 0;
+    soma += saldo;
     count++;
 
     tb.innerHTML += `
       <tr>
-        <td>${nomeProduto}</td>
-        <td>${item.fields.CodigoFornecedor || ""}</td>
-        <td>${item.fields.DescricaoProduto || ""}</td>
-        <td>${item.fields.NomeFornecedor || ""}</td>
-        <td>${item.fields.UnidadeMedida || ""}</td>
-        <td style="font-weight:bold;color:${saldoCalculado < 0 ? "#c00" : "#222"}">
-          ${saldoCalculado.toLocaleString("pt-BR")}
+        <td>${item.Title || ""}</td>
+        <td>${item.CodigoFornecedor || ""}</td>
+        <td>${item.DescricaoProduto || ""}</td>
+        <td>${item.NomeFornecedor || ""}</td>
+        <td>${item.UnidadeMedida || ""}</td>
+        <td style="font-weight:bold;color:${saldo < 0 ? "#c00" : "#222"}">
+          ${saldo.toLocaleString("pt-BR")}
         </td>
-        <td>${item.fields.DataAtualizacao ? new Date(item.fields.DataAtualizacao).toLocaleString("pt-BR") : ""}</td>
+        <td>${item.DataAtualizacao ? new Date(item.DataAtualizacao).toLocaleString("pt-BR") : ""}</td>
       </tr>`;
+  });
 
-    document.getElementById('saldoInfo').textContent = `Carregados ${count}/${rows.length}`;
-  }
-
-  document.getElementById('resumoSaldo').textContent =
+  document.getElementById("resumoSaldo").textContent =
     `Total de produtos: ${rows.length} | Soma total de estoque: ${soma.toLocaleString("pt-BR")}`;
-  document.getElementById('saldoInfo').textContent = `Itens: ${rows.length}`;
-  document.getElementById('hintSaldo').textContent = "Saldo atualizado com sucesso.";
+  document.getElementById("saldoInfo").textContent = `Itens: ${count}`;
+  document.getElementById("hintSaldo").textContent = "Saldo atualizado com sucesso.";
 }
 
-mostrar('home');
-getAccessTokenFromUrl(); // tenta capturar o token automaticamente
+mostrar("home");
 </script>
-
-
-
-
 </body>
 </html>
-
-
-
