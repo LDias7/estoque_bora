@@ -36,20 +36,22 @@ header {
 /* === HOME === */
 #home {
   min-height: calc(100vh - 80px);
-  display: grid;
-  place-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: var(--sub);
 }
 
 .grid-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 220px);
-  gap: 20px;
+  grid-template-columns: repeat(2, 200px);
+  gap: 25px 40px;
   justify-content: center;
+  align-items: center;
 }
 
 .grid-buttons button {
-  padding: 18px 32px;
+  padding: 18px 0;
   border: 0;
   border-radius: 12px;
   background: var(--btn);
@@ -58,6 +60,8 @@ header {
   font-weight: 700;
   cursor: pointer;
   transition: 0.2s;
+  width: 200px;
+  text-align: center;
 }
 .grid-buttons button:hover {
   background: var(--btnHover);
@@ -194,7 +198,7 @@ const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
 
 /* === NAVEGAÇÃO === */
 function mostrar(id) {
-  document.getElementById("home").style.display = id === "home" ? "grid" : "none";
+  document.getElementById("home").style.display = id === "home" ? "flex" : "none";
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   if (id !== "home") document.getElementById(id).classList.add("active");
   if (id === "saldo") carregarProdutos();
@@ -208,7 +212,7 @@ function abrirForm(tipo) {
 
 /* === BUSCAR LISTA PRODUTOS === */
 async function carregarProdutos() {
-  const endpoint = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_PRODUTOS}')/items?$format=json`;
+  const endpoint = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_PRODUTOS}')/items?$orderby=Title asc&$format=json`;
   try {
     document.getElementById("hintSaldo").textContent = "Carregando produtos...";
     const res = await fetch(endpoint, { headers: { Accept: "application/json;odata=verbose" } });
