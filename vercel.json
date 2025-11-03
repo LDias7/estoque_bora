@@ -1,16 +1,10 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
+  "public": true,
   "routes": [
-    { "src": "^/api/(.*)$", "dest": "/api/$1.js" },
-    { "handle": "filesystem" },
     {
       "src": "/(.*)",
-      "dest": "/public/index.html"
+      "dest": "/index.html"
     }
   ],
   "headers": [
