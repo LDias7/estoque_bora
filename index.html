@@ -184,11 +184,13 @@ th {
 /* === CONFIG === */
 const SITE_URL = "https://borexpress.sharepoint.com/sites/EstoqueJC";
 const LIST_PRODUTOS = "Produtos";
+const LIST_ENTRADA  = "Entrada";
+const LIST_SAIDA    = "Saída";
 
 /* === LINKS DOS FORMS === */
-const FORM_CAD = "https://forms.microsoft.com/r/cYKFvRQbRV";
+const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
-const FORM_SAIDA = "https://forms.microsoft.com/r/n2Rr51aG6s";
+const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
 
 /* === FUNÇÕES DE NAVEGAÇÃO === */
 function mostrar(id){
@@ -204,12 +206,13 @@ function abrirForm(tipo){
   if(tipo==='saida')    window.open(FORM_SAIDA,'_blank');
 }
 
-/* === CONSULTA SHAREPOINT === */
+/* === CONSULTAS SHAREPOINT === */
 async function carregarProdutos(){
   const endpoint = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_PRODUTOS}')/items?$orderby=Title asc`;
+  document.getElementById('hintSaldo').textContent = "Carregando produtos...";
   try {
     const res = await fetch(endpoint, { headers: { Accept: "application/json;odata=verbose" }});
-    if(!res.ok) throw new Error("Falha ao carregar lista.");
+    if(!res.ok) throw new Error("Falha ao carregar lista de produtos.");
     const data = await res.json();
     renderSaldo(data.d.results);
   } catch(e) {
@@ -218,32 +221,66 @@ async function carregarProdutos(){
   }
 }
 
+/* === CALCULA SALDO A PARTIR DE ENTRADAS E SAÍDAS === */
+async function getEntradasSaidas(produtoNome) {
+  const entradasURL = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_ENTRADA}')/items?$filter=Produto eq '${produtoNome}'`;
+  const saidasURL   = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_SAIDA}')/items?$filter=Produto eq '${produtoNome}'`;
+
+  const [entradasRes, saidasRes] = await Promise.all([
+    fetch(entradasURL, { headers: { Accept: "application/json;odata=verbose" }}),
+    fetch(saidasURL,   { headers: { Accept: "application/json;odata=verbose" }})
+  ]);
+
+  const entradasData = await entradasRes.json();
+  const saidasData   = await saidasRes.json();
+
+  const totalEntradas = entradasData.d.results.reduce((sum, item) => sum + (Number(item.Quantidade)||0), 0);
+  const totalSaidas   = saidasData.d.results.reduce((sum, item) => sum + (Number(item.Quantidade)||0), 0);
+
+  return totalEntradas - totalSaidas;
+}
+
 /* === RENDER === */
-function renderSaldo(rows){
+async function renderSaldo(rows){
   const tb = document.querySelector('#tableSaldo tbody');
   tb.innerHTML = '';
+  document.getElementById('hintSaldo').textContent = "Calculando saldos...";
+
   let soma = 0;
-  rows.forEach(item=>{
-    const s = Number(item.SaldoAtual)||0;
-    soma += s;
+  let count = 0;
+
+  for(const item of rows){
+    const nomeProduto = item.Title || '';
+    const saldoCalculado = await getEntradasSaidas(nomeProduto);
+    soma += saldoCalculado;
+    count++;
+
     tb.innerHTML += `
       <tr>
-        <td>${item.Title||''}</td>
+        <td>${nomeProduto}</td>
         <td>${item.CodigoFornecedor||''}</td>
         <td>${item.DescricaoProduto||''}</td>
         <td>${item.NomeFornecedor||''}</td>
         <td>${item.UnidadeMedida||''}</td>
-        <td>${s.toLocaleString('pt-BR')}</td>
+        <td style="font-weight:bold;color:${saldoCalculado<0?'#c00':'#222'}">
+          ${saldoCalculado.toLocaleString('pt-BR')}
+        </td>
         <td>${item.DataAtualizacao ? new Date(item.DataAtualizacao).toLocaleString('pt-BR') : ''}</td>
       </tr>`;
-  });
-  document.getElementById('resumoSaldo').textContent = 
+
+    document.getElementById('saldoInfo').textContent = `Carregados ${count}/${rows.length}`;
+  }
+
+  document.getElementById('resumoSaldo').textContent =
     `Total de produtos: ${rows.length} | Soma total de estoque: ${soma.toLocaleString('pt-BR')}`;
   document.getElementById('saldoInfo').textContent = `Itens: ${rows.length}`;
+  document.getElementById('hintSaldo').textContent = "Saldo atualizado com sucesso.";
 }
 
 mostrar('home');
 </script>
 
+
 </body>
 </html>
+
