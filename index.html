@@ -206,15 +206,18 @@ function abrirForm(tipo){
   if(tipo==='saida')    window.open(FORM_SAIDA,'_blank');
 }
 
+/* === CABEÇALHO PADRÃO SHAREPOINT === */
+const SP_HEADERS = { Accept: "application/json;odata=nometadata" };
+
 /* === CONSULTAS SHAREPOINT === */
 async function carregarProdutos(){
   const endpoint = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_PRODUTOS}')/items?$orderby=Title asc`;
   document.getElementById('hintSaldo').textContent = "Carregando produtos...";
   try {
-    const res = await fetch(endpoint, { headers: { Accept: "application/json;odata=verbose" }});
+    const res = await fetch(endpoint, { headers: SP_HEADERS });
     if(!res.ok) throw new Error("Falha ao carregar lista de produtos.");
     const data = await res.json();
-    renderSaldo(data.d.results);
+    renderSaldo(data.value || data.d?.results || []);
   } catch(e) {
     console.error(e);
     document.getElementById('hintSaldo').textContent = "Erro ao carregar dados do SharePoint.";
@@ -227,15 +230,18 @@ async function getEntradasSaidas(produtoNome) {
   const saidasURL   = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_SAIDA}')/items?$filter=Produto eq '${produtoNome}'`;
 
   const [entradasRes, saidasRes] = await Promise.all([
-    fetch(entradasURL, { headers: { Accept: "application/json;odata=verbose" }}),
-    fetch(saidasURL,   { headers: { Accept: "application/json;odata=verbose" }})
+    fetch(entradasURL, { headers: SP_HEADERS }),
+    fetch(saidasURL,   { headers: SP_HEADERS })
   ]);
 
   const entradasData = await entradasRes.json();
   const saidasData   = await saidasRes.json();
 
-  const totalEntradas = entradasData.d.results.reduce((sum, item) => sum + (Number(item.Quantidade)||0), 0);
-  const totalSaidas   = saidasData.d.results.reduce((sum, item) => sum + (Number(item.Quantidade)||0), 0);
+  const entradas = entradasData.value || entradasData.d?.results || [];
+  const saidas   = saidasData.value || saidasData.d?.results || [];
+
+  const totalEntradas = entradas.reduce((sum, item) => sum + (Number(item.Quantidade)||0), 0);
+  const totalSaidas   = saidas.reduce((sum, item) => sum + (Number(item.Quantidade)||0), 0);
 
   return totalEntradas - totalSaidas;
 }
@@ -281,6 +287,8 @@ mostrar('home');
 </script>
 
 
+
 </body>
 </html>
+
 
