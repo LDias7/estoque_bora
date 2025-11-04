@@ -68,6 +68,19 @@ header {
   transform: scale(1.05);
 }
 
+/* Centralizar o botão saldo */
+.grid-buttons-home {
+  display: grid;
+  grid-template-columns: repeat(2, 200px);
+  gap: 25px 40px;
+  justify-content: center;
+  align-items: center;
+}
+.grid-buttons-home .saldo-btn {
+  grid-column: span 2;
+  justify-self: center;
+}
+
 /* === PÁGINAS === */
 .page {
   display: none;
@@ -81,32 +94,42 @@ header {
 }
 .page.active { display: block; }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
 .topbar h2 {
   margin: 0;
   color: var(--primary);
   font-size: 28px;
+  text-align: center;
+  margin-bottom: 20px;
 }
-.right { margin-left: auto; }
 
 .btn {
-  padding: 12px 18px;
+  padding: 14px 20px;
   border: 0;
   border-radius: 10px;
   background: var(--btn);
   color: #fff;
   font-weight: 700;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
 }
 .btn:hover { background: var(--btnHover); }
 .btn-grey { background: #888; }
 .btn-grey:hover { background: #6f6f6f; }
+
+.center-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+iframe {
+  width: 100%;
+  height: 600px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-top: 20px;
+}
 
 table {
   width: 100%;
@@ -129,85 +152,72 @@ th { background: var(--sub); }
 
 <!-- HOME -->
 <section id="home">
-  <div class="grid-buttons">
+  <div class="grid-buttons-home">
     <button onclick="mostrar('entradaMenu')">Entrada</button>
     <button onclick="mostrar('saidaMenu')">Saída</button>
-    <button onclick="mostrar('saldo')">Saldo</button>
+    <button class="saldo-btn" onclick="mostrar('saldo')">Saldo</button>
   </div>
 </section>
 
 <!-- MENU ENTRADA -->
 <section id="entradaMenu" class="page">
-  <div class="topbar">
-    <button class="btn btn-grey" onclick="mostrar('home')">Voltar</button>
-    <h2>Entradas</h2>
-  </div>
-  <div class="grid-buttons">
+  <div class="topbar"><h2>Entradas</h2></div>
+  <div class="center-btns">
     <button onclick="abrirForm('entrada')">Cadastrar Entrada</button>
-    <button onclick="abrirLista('entrada')">Histórico de Entradas</button>
+    <button onclick="mostrarHistorico('entrada')">Histórico de Entradas</button>
+    <button class="btn-grey" onclick="mostrar('home')">Voltar</button>
+  </div>
+  <div id="frameEntrada" style="display:none;">
+    <iframe id="iframeEntrada"></iframe>
   </div>
 </section>
 
 <!-- MENU SAÍDA -->
 <section id="saidaMenu" class="page">
-  <div class="topbar">
-    <button class="btn btn-grey" onclick="mostrar('home')">Voltar</button>
-    <h2>Saídas</h2>
-  </div>
-  <div class="grid-buttons">
+  <div class="topbar"><h2>Saídas</h2></div>
+  <div class="center-btns">
     <button onclick="abrirForm('saida')">Cadastrar Saída</button>
-    <button onclick="abrirLista('saida')">Histórico de Saídas</button>
+    <button onclick="mostrarHistorico('saida')">Histórico de Saídas</button>
+    <button class="btn-grey" onclick="mostrar('home')">Voltar</button>
+  </div>
+  <div id="frameSaida" style="display:none;">
+    <iframe id="iframeSaida"></iframe>
   </div>
 </section>
 
 <!-- SALDO -->
 <section id="saldo" class="page">
-  <div class="topbar">
-    <button class="btn btn-grey" onclick="mostrar('home')">Voltar</button>
-    <h2>Saldo de Produtos (≥ 1)</h2>
-  </div>
-
-  <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:var(--primary)">
-    Carregando...
-  </div>
-
-  <div class="toolbar">
+  <div class="topbar"><h2>Saldo de Produtos (≥ 1)</h2></div>
+  <div class="center-btns">
     <button class="btn" onclick="carregarSaldo()">Recarregar</button>
-    <span id="saldoInfo" class="hint right">—</span>
+    <button class="btn-grey" onclick="mostrar('home')">Voltar</button>
   </div>
-
+  <p id="hintSaldo" class="hint">Carregando...</p>
   <table id="tableSaldo">
     <thead>
       <tr>
         <th>Produto</th>
-        <th>Fornecedor</th>
-        <th>Unidade</th>
         <th>Saldo Atual</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-  <div id="hintSaldo" class="hint" style="margin-top:8px;"></div>
 </section>
 
 <script>
 /* === CONFIG === */
 const SITE_URL = "https://borexpress.sharepoint.com/sites/EstoqueJC";
 const LIST_ENTRADA = "Entrada";
-const LIST_SAIDA = "Saida";
-const LIST_PRODUTOS = "Produtos";
+const LIST_SAIDA = "Sadas";
 
 /* === LINKS === */
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
 const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
-const LISTA_ENTRADA = `${SITE_URL}/Lists/Entrada/AllItems.aspx`;
-const LISTA_SAIDA   = `${SITE_URL}/Lists/Sadas/AllItems.aspx`;
 
 /* === NAVEGAÇÃO === */
 function mostrar(id) {
-  document.querySelectorAll("section").forEach(p => p.style.display = "none");
-  if (id === "home") document.getElementById("home").style.display = "flex";
-  else document.getElementById(id).style.display = "block";
+  document.querySelectorAll("section").forEach(s => s.style.display = "none");
+  document.getElementById(id).style.display = "block";
   if (id === "saldo") carregarSaldo();
 }
 
@@ -216,64 +226,55 @@ function abrirForm(tipo) {
   if (tipo === "saida") window.open(FORM_SAIDA, "_blank");
 }
 
-function abrirLista(tipo) {
-  if (tipo === "entrada") window.open(LISTA_ENTRADA, "_blank");
-  if (tipo === "saida") window.open(LISTA_SAIDA, "_blank");
+/* === HISTÓRICO DENTRO DA TELA === */
+function mostrarHistorico(tipo) {
+  if (tipo === "entrada") {
+    document.getElementById("frameEntrada").style.display = "block";
+    document.getElementById("iframeEntrada").src = `${SITE_URL}/Lists/${LIST_ENTRADA}/AllItems.aspx`;
+  }
+  if (tipo === "saida") {
+    document.getElementById("frameSaida").style.display = "block";
+    document.getElementById("iframeSaida").src = `${SITE_URL}/Lists/${LIST_SAIDA}/AllItems.aspx`;
+  }
 }
 
 /* === SALDO === */
 async function carregarSaldo() {
+  const hint = document.getElementById("hintSaldo");
+  const tbody = document.querySelector("#tableSaldo tbody");
+  tbody.innerHTML = "";
+  hint.textContent = "Carregando dados...";
+
   try {
-    document.getElementById("hintSaldo").textContent = "Carregando dados...";
-    const [entradas, saidas] = await Promise.all([
-      fetch(`${SITE_URL}/_api/web/lists/GetByTitle('${LIST_ENTRADA}')/items?$select=Title,Quantidade`, { headers: { Accept: "application/json;odata=verbose" } }).then(r => r.json()),
-      fetch(`${SITE_URL}/_api/web/lists/GetByTitle('${LIST_SAIDA}')/items?$select=Title,Quantidade`, { headers: { Accept: "application/json;odata=verbose" } }).then(r => r.json())
+    const [resE, resS] = await Promise.all([
+      fetch(`${SITE_URL}/_api/web/lists/GetByTitle('${LIST_ENTRADA}')/items`, { headers: { Accept: "application/json;odata=nometadata" } }),
+      fetch(`${SITE_URL}/_api/web/lists/GetByTitle('${LIST_SAIDA}')/items`, { headers: { Accept: "application/json;odata=nometadata" } })
     ]);
 
+    const entradas = await resE.json();
+    const saidas = await resS.json();
+
     const saldo = {};
-    entradas.d.results.forEach(e => {
-      if (!saldo[e.Title]) saldo[e.Title] = 0;
-      saldo[e.Title] += Number(e.Quantidade) || 0;
-    });
-    saidas.d.results.forEach(s => {
-      if (!saldo[s.Title]) saldo[s.Title] = 0;
-      saldo[s.Title] -= Number(s.Quantidade) || 0;
+    entradas.value?.forEach(i => saldo[i.Title] = (saldo[i.Title] || 0) + (Number(i.Quantidade) || 0));
+    saidas.value?.forEach(i => saldo[i.Title] = (saldo[i.Title] || 0) - (Number(i.Quantidade) || 0));
+
+    const produtos = Object.entries(saldo).filter(([_, qtd]) => qtd >= 1);
+
+    produtos.forEach(([nome, qtd]) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${nome}</td>
+          <td style="font-weight:bold;">${qtd}</td>
+        </tr>`;
     });
 
-    const produtos = Object.entries(saldo)
-      .filter(([_, q]) => q >= 1)
-      .map(([nome, qtd]) => ({ nome, qtd }));
-
-    renderSaldo(produtos);
+    hint.textContent = produtos.length > 0 ? "Saldo carregado com sucesso." : "Nenhum produto com estoque ≥ 1.";
   } catch (err) {
-    console.error(err);
-    document.getElementById("hintSaldo").textContent = "Erro ao carregar saldo: " + err.message;
+    hint.textContent = "Erro ao carregar saldo: " + err.message;
   }
-}
-
-/* === RENDERIZAÇÃO === */
-function renderSaldo(produtos) {
-  const tb = document.querySelector("#tableSaldo tbody");
-  tb.innerHTML = "";
-  let total = 0;
-
-  produtos.forEach(p => {
-    total += p.qtd;
-    tb.innerHTML += `
-      <tr>
-        <td>${p.nome}</td>
-        <td>—</td>
-        <td>Un</td>
-        <td style="font-weight:bold;color:${p.qtd < 0 ? "#c00" : "#222"}">${p.qtd}</td>
-      </tr>`;
-  });
-
-  document.getElementById("resumoSaldo").textContent = `Produtos em estoque: ${produtos.length} | Total geral: ${total}`;
-  document.getElementById("hintSaldo").textContent = "Saldo carregado com sucesso.";
 }
 
 mostrar("home");
 </script>
 </body>
 </html>
-
