@@ -79,9 +79,8 @@ header {
   border-radius: 12px;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
 }
-.page.active {
-  display: block;
-}
+.page.active { display: block; }
+
 .topbar {
   display: flex;
   align-items: center;
@@ -93,9 +92,7 @@ header {
   color: var(--primary);
   font-size: 28px;
 }
-.right {
-  margin-left: auto;
-}
+.right { margin-left: auto; }
 
 .btn {
   padding: 12px 18px;
@@ -107,17 +104,10 @@ header {
   cursor: pointer;
   font-size: 16px;
 }
-.btn:hover {
-  background: var(--btnHover);
-}
-.btn-grey {
-  background: #888;
-}
-.btn-grey:hover {
-  background: #6f6f6f;
-}
+.btn:hover { background: var(--btnHover); }
+.btn-grey { background: #888; }
+.btn-grey:hover { background: #6f6f6f; }
 
-/* === TABELAS === */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -129,13 +119,8 @@ th, td {
   padding: 10px;
   text-align: left;
 }
-th {
-  background: var(--sub);
-}
-.hint {
-  color: var(--muted);
-  font-size: 14px;
-}
+th { background: var(--sub); }
+.hint { color: var(--muted); font-size: 14px; }
 </style>
 </head>
 <body>
@@ -145,111 +130,146 @@ th {
 <!-- HOME -->
 <section id="home">
   <div class="grid-buttons">
-    <button onclick="abrirForm('cadastro')">Cadastro</button>
-    <button onclick="abrirForm('entrada')">Entrada</button>
-    <button onclick="abrirForm('saida')">Saída</button>
+    <button onclick="mostrar('entradaMenu')">Entrada</button>
+    <button onclick="mostrar('saidaMenu')">Saída</button>
     <button onclick="mostrar('saldo')">Saldo</button>
+  </div>
+</section>
+
+<!-- MENU ENTRADA -->
+<section id="entradaMenu" class="page">
+  <div class="topbar">
+    <button class="btn btn-grey" onclick="mostrar('home')">Voltar</button>
+    <h2>Entradas</h2>
+  </div>
+  <div class="grid-buttons">
+    <button onclick="abrirForm('entrada')">Cadastrar Entrada</button>
+    <button onclick="abrirLista('entrada')">Histórico de Entradas</button>
+  </div>
+</section>
+
+<!-- MENU SAÍDA -->
+<section id="saidaMenu" class="page">
+  <div class="topbar">
+    <button class="btn btn-grey" onclick="mostrar('home')">Voltar</button>
+    <h2>Saídas</h2>
+  </div>
+  <div class="grid-buttons">
+    <button onclick="abrirForm('saida')">Cadastrar Saída</button>
+    <button onclick="abrirLista('saida')">Histórico de Saídas</button>
   </div>
 </section>
 
 <!-- SALDO -->
 <section id="saldo" class="page">
   <div class="topbar">
-    <button class="btn btn-grey" onclick="mostrar('home')">Início</button>
-    <h2>Saldo de Produtos</h2>
+    <button class="btn btn-grey" onclick="mostrar('home')">Voltar</button>
+    <h2>Saldo de Produtos (≥ 1)</h2>
   </div>
 
   <div id="resumoSaldo" class="hint" style="font-size:18px;font-weight:bold;margin-bottom:8px;color:var(--primary)">
-    Total de produtos: 0 | Soma total de estoque: 0
+    Carregando...
   </div>
 
   <div class="toolbar">
-    <button class="btn" onclick="carregarProdutos()">Recarregar</button>
+    <button class="btn" onclick="carregarSaldo()">Recarregar</button>
     <span id="saldoInfo" class="hint right">—</span>
   </div>
 
   <table id="tableSaldo">
     <thead>
       <tr>
-        <th>Título</th>
-        <th>Código Fornecedor</th>
-        <th>Descrição Produto</th>
-        <th>Nome Fornecedor</th>
+        <th>Produto</th>
+        <th>Fornecedor</th>
         <th>Unidade</th>
         <th>Saldo Atual</th>
-        <th>Data Atualização</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-
   <div id="hintSaldo" class="hint" style="margin-top:8px;"></div>
 </section>
 
 <script>
-/* === CONFIG SHAREPOINT === */
+/* === CONFIG === */
 const SITE_URL = "https://borexpress.sharepoint.com/sites/EstoqueJC";
+const LIST_ENTRADA = "Entrada";
+const LIST_SAIDA = "Saida";
 const LIST_PRODUTOS = "Produtos";
 
-/* === LINKS DOS FORMS === */
-const FORM_CAD     = "https://forms.microsoft.com/r/cYKFvRQbRV";
+/* === LINKS === */
 const FORM_ENTRADA = "https://forms.microsoft.com/r/8EaCX7pKRQ";
 const FORM_SAIDA   = "https://forms.microsoft.com/r/n2Rr51aG6s";
+const LISTA_ENTRADA = `${SITE_URL}/Lists/Entrada/AllItems.aspx`;
+const LISTA_SAIDA   = `${SITE_URL}/Lists/Saida/AllItems.aspx`;
 
 /* === NAVEGAÇÃO === */
 function mostrar(id) {
-  document.getElementById("home").style.display = id === "home" ? "flex" : "none";
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  if (id !== "home") document.getElementById(id).classList.add("active");
-  if (id === "saldo") carregarProdutos();
+  document.querySelectorAll("section").forEach(p => p.style.display = "none");
+  if (id === "home") document.getElementById("home").style.display = "flex";
+  else document.getElementById(id).style.display = "block";
+  if (id === "saldo") carregarSaldo();
 }
 
 function abrirForm(tipo) {
-  if (tipo === "cadastro") window.open(FORM_CAD, "_blank");
-  if (tipo === "entrada")  window.open(FORM_ENTRADA, "_blank");
-  if (tipo === "saida")    window.open(FORM_SAIDA, "_blank");
+  if (tipo === "entrada") window.open(FORM_ENTRADA, "_blank");
+  if (tipo === "saida") window.open(FORM_SAIDA, "_blank");
 }
 
-/* === BUSCAR LISTA PRODUTOS === */
-async function carregarProdutos() {
-  const endpoint = `${SITE_URL}/_api/web/lists/GetByTitle('${LIST_PRODUTOS}')/items?$orderby=Title asc&$format=json`;
+function abrirLista(tipo) {
+  if (tipo === "entrada") window.open(LISTA_ENTRADA, "_blank");
+  if (tipo === "saida") window.open(LISTA_SAIDA, "_blank");
+}
+
+/* === SALDO === */
+async function carregarSaldo() {
   try {
-    document.getElementById("hintSaldo").textContent = "Carregando produtos...";
-    const res = await fetch(endpoint, { headers: { Accept: "application/json;odata=verbose" } });
-    if (!res.ok) throw new Error("Falha ao carregar lista.");
-    const data = await res.json();
-    renderSaldo(data.d.results);
-  } catch (e) {
-    console.error(e);
-    document.getElementById("hintSaldo").textContent = "Erro ao carregar dados: " + e.message;
+    document.getElementById("hintSaldo").textContent = "Carregando dados...";
+    const [entradas, saidas] = await Promise.all([
+      fetch(`${SITE_URL}/_api/web/lists/GetByTitle('${LIST_ENTRADA}')/items?$select=Title,Quantidade`, { headers: { Accept: "application/json;odata=verbose" } }).then(r => r.json()),
+      fetch(`${SITE_URL}/_api/web/lists/GetByTitle('${LIST_SAIDA}')/items?$select=Title,Quantidade`, { headers: { Accept: "application/json;odata=verbose" } }).then(r => r.json())
+    ]);
+
+    const saldo = {};
+    entradas.d.results.forEach(e => {
+      if (!saldo[e.Title]) saldo[e.Title] = 0;
+      saldo[e.Title] += Number(e.Quantidade) || 0;
+    });
+    saidas.d.results.forEach(s => {
+      if (!saldo[s.Title]) saldo[s.Title] = 0;
+      saldo[s.Title] -= Number(s.Quantidade) || 0;
+    });
+
+    const produtos = Object.entries(saldo)
+      .filter(([_, q]) => q >= 1)
+      .map(([nome, qtd]) => ({ nome, qtd }));
+
+    renderSaldo(produtos);
+  } catch (err) {
+    console.error(err);
+    document.getElementById("hintSaldo").textContent = "Erro ao carregar saldo: " + err.message;
   }
 }
 
 /* === RENDERIZAÇÃO === */
-function renderSaldo(rows) {
+function renderSaldo(produtos) {
   const tb = document.querySelector("#tableSaldo tbody");
   tb.innerHTML = "";
-  let soma = 0;
+  let total = 0;
 
-  rows.forEach(item => {
-    const s = Number(item.SaldoAtual) || 0;
-    soma += s;
+  produtos.forEach(p => {
+    total += p.qtd;
     tb.innerHTML += `
       <tr>
-        <td>${item.Title || ""}</td>
-        <td>${item.CodigoFornecedor || ""}</td>
-        <td>${item.DescricaoProduto || ""}</td>
-        <td>${item.NomeFornecedor || ""}</td>
-        <td>${item.UnidadeMedida || ""}</td>
-        <td style="font-weight:bold;color:${s < 0 ? "#c00" : "#222"}">${s.toLocaleString("pt-BR")}</td>
-        <td>${item.DataAtualizacao ? new Date(item.DataAtualizacao).toLocaleString("pt-BR") : ""}</td>
+        <td>${p.nome}</td>
+        <td>—</td>
+        <td>Un</td>
+        <td style="font-weight:bold;color:${p.qtd < 0 ? "#c00" : "#222"}">${p.qtd}</td>
       </tr>`;
   });
 
-  document.getElementById("resumoSaldo").textContent =
-    `Total de produtos: ${rows.length} | Soma total de estoque: ${soma.toLocaleString("pt-BR")}`;
-  document.getElementById("saldoInfo").textContent = `Itens: ${rows.length}`;
-  document.getElementById("hintSaldo").textContent = "Saldo atualizado com sucesso.";
+  document.getElementById("resumoSaldo").textContent = `Produtos em estoque: ${produtos.length} | Total geral: ${total}`;
+  document.getElementById("hintSaldo").textContent = "Saldo carregado com sucesso.";
 }
 
 mostrar("home");
